@@ -38,7 +38,7 @@ def create_dict_edges(faces):
     where (p1,p2) is in.
 
     Args:
-        faces (np.array): An array with all the faces 
+        faces (?): An array with all the faces 
 
     Returns:
         dict: A dict
@@ -51,7 +51,7 @@ def create_dict_edges(faces):
     for face in faces:
         
         # Creation of a list with the points of the face
-        points = [face.a,face.b,face.c,face.a]
+        points = [face[0],face[1],face[2],face[0]]
         
         # Enumeration on all the edges of the current face
         for i in range(3):
@@ -68,7 +68,7 @@ def create_dict_edges(faces):
             else :
                 
                 # In the other case, we create a new key and set the counter to 1
-                edges_dic[key] += 1
+                edges_dic[key] = 1
 
     # Return the list of edges
     return edges_dic

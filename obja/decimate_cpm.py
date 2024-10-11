@@ -3,7 +3,7 @@
 import obja
 import numpy as np
 import sys
-from utils import check_neighbour, create_list_edges
+from utils import *
 
 class Decimater(obja.Model):
     """
@@ -15,15 +15,15 @@ class Decimater(obja.Model):
 
     def contract(self, output):
         
-        operations = []
-        edges = create_dict_edges(self.faces)
+        # operations = []
+        # edges = create_dict_edges(self.faces)
 
-        collapse = [True for ]
+        # collapse = [True for ]
         
-
+        a = 2
         
-        print(edges)
-        print(collapse)
+        # print(edges)
+        # print(collapse)
         
         # # Iterate through the vertex
         # for (vertex_index, vertex) in enumerate(self.vertices):
