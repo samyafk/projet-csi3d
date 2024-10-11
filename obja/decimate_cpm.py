@@ -24,8 +24,7 @@ class Decimater(obja.Model):
 
         collapse = [True for i in range(len(edges))]
         
-        print(edges)
-        #print(collapse)
+        
 
         # # Iterate through the vertex
         # for (vertex_index, vertex) in enumerate(self.vertices):
