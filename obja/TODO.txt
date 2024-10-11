@@ -5,7 +5,7 @@
 3. Parcourir la liste et pour chaque edge :
 	a. Collapse si possible -> écriture des opérations : duplication du point, translations
 	b. Màj de la liste de edges (supprimer les 3 edges)
-
+	c. Màj de la liste des collapsables (mettre les edges adjacents à non collapsable)
 
 
 
