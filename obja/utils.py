@@ -1,3 +1,5 @@
+from warnings import warn
+
 def edg2key(p1:int,p2:int)->str:
     """Create a str key with two points
 
@@ -82,6 +84,8 @@ def check_second_condition(edges):
 
 
 def check_neighbour(edge, edges):
+    #FIXME fonction obselete (cf. neighbours)
+    warn("fonction obselete (cf. neighbours) pour la mettre à jour", DeprecationWarning, stacklevel=2)
     
     # get the first vertice
     v1 = edge[0]
@@ -113,3 +117,47 @@ def check_neighbour(edge, edges):
     intersect = [v for v in v1_neighbours if v in v2_neighbours]
     
     return len(intersect) <= 2
+
+def neighbours(vertex: int, edges: list) -> list:
+    neighbours = []
+    for e in edges:
+        if vertex == e[0]:
+            neighbours.append(e[1])
+        elif vertex == e[1]:
+            neighbours.append(e[0])
+        
+    return neighbours
+
+
+def vertex_tri(edge: list, edges: dict) -> tuple:
+    v1, v2 = edge[0], edge[1]
+    v1_neighbours = neighbours(v1, edges)
+    v2_neighbours = neighbours(v2, edges)
+            
+    intersect = [v for v in v1_neighbours if v in v2_neighbours]
+    
+    if len(intersect) != 2:
+        #TODO Gerer l'execption
+        raise("Uh oh!")
+    
+    return intersect[0], intersect[1]
+
+
+def check_quad(edge: list, edges: dict):
+    #FIXME optimiser les boucles de recherche de key/edge
+    w1, w2 = vertex_tri(edge, edges)
+    
+    w1_neighbours = neighbours(w1, edges)
+    w2_neighbours = neighbours(w2, edges)
+    
+    if len(w1_neighbours) == 4:
+        for i, j in range(4):
+            key = edg2key(w1_neighbours[i], w1_neighbours[j])
+            if key in edges.keys():
+                edges[key] = False
+    
+    if len(w2_neighbours) == 4:
+        for i, j in range(4):
+            key = edg2key(w2_neighbours[i], w2_neighbours[j])
+            if key in edges.keys():
+                edges[key] = False
