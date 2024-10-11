@@ -27,10 +27,11 @@ class Decimater(obja.Model):
         collapsed_vertices = []
         
         # For each edges in the dict
-        for key,value in edges:
-    
+        for key in edges:
+            
+            collapsible = edges[key]
             # If second and third condition ok
-            if value:
+            if collapsible:
                 
                 # Get the vertices of the edge
                 edge = key2edg(key)
@@ -94,7 +95,7 @@ def main():
     """
     Runs the program on the model given as parameter.
     """
-    filename = 'schema_b.obj'
+    filename = 'suzanne.obj'
     np.seterr(invalid = 'raise')
     model = Decimater()
     model.parse_file('example/'+filename)

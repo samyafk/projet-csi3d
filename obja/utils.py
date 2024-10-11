@@ -53,7 +53,7 @@ def create_dict_edges(faces):
     for face in faces:
         
         # Creation of a list with the points of the face
-        points = [face[0],face[1],face[2],face[0]]
+        points = [face.a,face.b,face.c,face.a]
         
         # Enumeration on all the edges of the current face
         for i in range(3):
