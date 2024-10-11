@@ -1,3 +1,27 @@
+def create_list_edges(faces):
+    """Create a list with all the edges reguarding a list of all the faces
+
+    Args:
+        faces (np.array): The list of all the faces of the model
+    """
+    
+    # Creation of an empty list to have all the edges
+    edges = []
+    
+    # Enumeration on all the faces
+    for (face_index, face) in enumerate():
+        
+        # Append the first edge
+        edges.append((face.a,face.b))
+        
+        # Append the second edge
+        edges.append((face.b,face.c))
+        
+        # Append the third edge
+        edges.append((face.a,face.c))
+
+
+
 
 def check_neighbour(edge, edges, collapse):
     v1 = edge[0]
