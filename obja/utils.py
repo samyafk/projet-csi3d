@@ -1,5 +1,36 @@
-def edg2key(p1:int,p2:int):
-    return str(p1) + "," + str(p2)
+def edg2key(p1:int,p2:int)->str:
+    """Create a str key with two points
+
+    Args:
+        p1 (int): the first point
+        p2 (int): the second point
+
+    Returns:
+        str: the final key
+    """
+    
+    # We want the smallest number first
+    if p1 < p2:
+        return str(p1) + "," + str(p2)
+    else:
+        return str(p2) + "," + str(p1)
+    
+    
+def key2edg(key: str) -> tuple:
+    """Convert a str key back into two points 
+
+    Args:
+        key (str): the key in the format 'p1,p2'
+
+    Returns:
+        tuple: a tuple of two integers (p1, p2)
+    """
+    
+    # Split the key 
+    p1, p2 = map(int, key.split(","))
+    
+    return (p1, p2)
+    
 
 
 def create_dict_edges(faces):
