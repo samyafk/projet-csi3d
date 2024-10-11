@@ -3,6 +3,7 @@
 import obja
 import numpy as np
 import sys
+from utils import check_neighbour, create_list_edges
 
 class Decimater(obja.Model):
     """
@@ -15,17 +16,15 @@ class Decimater(obja.Model):
     def contract(self, output):
         
         operations = []
-        edges = []
+        edges = create_dict_edges(self.faces)
 
-        for (face_index, face) in enumerate(self.faces):
-            edges.append((face.a,face.b))
-            edges.append((face.b,face.c))
-            edges.append((face.a,face.c))
-
-        collapse = [True for i in range(len(edges))]
-        
+        collapse = [True for ]
         
 
+        
+        print(edges)
+        print(collapse)
+        
         # # Iterate through the vertex
         # for (vertex_index, vertex) in enumerate(self.vertices):
 
@@ -60,11 +59,12 @@ def main():
     """
     Runs the program on the model given as parameter.
     """
+    filename = 'schema_b.obj'
     np.seterr(invalid = 'raise')
     model = Decimater()
-    model.parse_file('example/suzanne.obj')
+    model.parse_file('example/'+filename)
 
-    with open('example/suzanne.obja', 'w') as output:
+    with open('example/'+filename+'a', 'w') as output:
         model.contract(output)
 
 
