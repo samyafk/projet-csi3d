@@ -15,12 +15,31 @@ class Decimater(obja.Model):
 
     def contract(self, output):
         
+        # Create the dict with the edges
+        edges = create_dict_edges(self.faces)
+        
+        # Resolve the third condition -> Create a graph (nx lib) and check for cycle of length 4
+        
+        # For each edges in the dict
+        
+            # Check if the number is < 3
+            
+            # Check is the edges is not in a cycle of 4 (we can just have a long list with all the edges in a cycle of 4)
+            
+            # Check if one point of the two (in the edge) have a link with an edge already collapsed
+            
+            # If collapsable : 
+            
+                # collapse the edge
+                
+                # Add p1 and p2 in a list -> for the third check
+            
+            
+        
         # operations = []
         # edges = create_dict_edges(self.faces)
 
         # collapse = [True for ]
-        
-        a = 2
         
         # print(edges)
         # print(collapse)
