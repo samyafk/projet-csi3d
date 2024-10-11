@@ -14,35 +14,44 @@ def t_edg2key():
 def t_key2edg():
     key = '1,2'
     
-    if key2edg(key) == (1,2):
+    if key2edg(key) == [1,2]:
         return True
     else:
         return False
     
-def t1_create_dict_edges():
     
-    # Creation of some faces
-    faces = [[1,2,3],[1,4,2],[1,5,2]]
+def t1_check_neighbour():
+    # Creation of an edge
+    edge = [0,1]
     
-    # Creation of the dict
-    dic = create_dict_edges(faces)
+    # List of the edges of the problematic figure (b)
+    edges = create_dict_edges([[0,1,2],[0,1,4],[0,3,1]])
     
-    if dic['1,2'] == 3:
-        return True
-    else:
-        return False
+    # Return of the check
+    return check_neighbour(edge, edges)
+
+def t2_check_neighbour():
+    # Creation of an edge
+    edge = [0,2]
     
-def t2_create_dict_edges():
-    # Creation of some faces
-    faces = [[1,2,3],[1,4,2],[1,5,2]]
+    # List of the edges of the problematic figure (b)
+    edges = create_dict_edges([[0,1,2],[0,1,4],[0,3,1]])
     
-    # Creation of the dict
-    dic = create_dict_edges(faces)
+    # Return of the check
+    return check_neighbour(edge, edges)
+
+def t_check_second_condition():
     
-    if dic['2,4'] == 1:
-        return True
-    else:
-        return False
+    # List of the edges of the problematic figure (b)
+    edges = create_dict_edges([[0,1,2],[0,1,4],[0,3,1]])
+    
+    verifedges = edges
+    
+    edges = check_second_condition(edges)
+    
+    verifedges[edg2key(0,1)] = False
+    
+    return edges == verifedges
     
 
 class TestPrime(unittest.TestCase):
@@ -50,10 +59,12 @@ class TestPrime(unittest.TestCase):
         self.assertTrue(t_edg2key())
     def test_key2edg(self):
         self.assertTrue(t_key2edg())
-    def test_1_create_dict_edges(self):
-        self.assertTrue(t1_create_dict_edges())
-    def test_2_create_dict_edges(self):
-        self.assertTrue(t2_create_dict_edges())
+    def test_1_check_neighbour(self):
+        self.assertFalse(t1_check_neighbour())
+    def test_2_check_neighbour(self):
+        self.assertTrue(t2_check_neighbour())
+    def test_check_second_condition(self):
+        self.assertTrue(t_check_second_condition())
 
         
         

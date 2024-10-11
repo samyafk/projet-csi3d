@@ -16,7 +16,7 @@ def edg2key(p1:int,p2:int)->str:
         return str(p2) + "," + str(p1)
     
     
-def key2edg(key: str) -> tuple:
+def key2edg(key: str) -> list:
     """Convert a str key back into two points 
 
     Args:
@@ -29,7 +29,7 @@ def key2edg(key: str) -> tuple:
     # Split the key 
     p1, p2 = map(int, key.split(","))
     
-    return (p1, p2)
+    return [p1, p2]
     
 
 
@@ -56,43 +56,60 @@ def create_dict_edges(faces):
         # Enumeration on all the edges of the current face
         for i in range(3):
             
+            # Creation of edge
+            edge = [points[i],points[i+1]]
+            
             # Creation of the associated key
             key = edg2key(points[i],points[i+1])
-            
-            # We check first if the edge is already represented in the dic
-            if key in edges_dic:
-                
-                # If already in the dict, we increment the counter
-                edges_dic[key] += 1
-            
-            else :
-                
-                # In the other case, we create a new key and set the counter to 1
-                edges_dic[key] = 1
+
+            # Set collapsable to true
+            edges_dic[key] = True
 
     # Return the list of edges
     return edges_dic
 
-
-
-
-# def check_neighbour(edge, edges):
-#     v1 = edge[0]
-#     v2 = edge[1]
-#     v1_neighbours = []
-#     v2_neighbours = []
-#     for e in edges:
-#         ve_1 = e[0]
-#         ve_2 = e[1]
-#         if v1==ve_1:
-#             v1_neighbours.append(ve_2)
-#         elif v1==ve_2:
-#             v1_neighbours.append(ve_1)
-#         elif v2==ve_1:
-#             v2_neighbours.append(ve_2)
-#         elif v2==ve_2:
-#             v2_neighbours.append(ve_1)
-            
-#     intersect = [v for v in v1_neighbours if v in v2_neighbours]
+def check_second_condition(edges):
     
-#     return len(intersect) <= 2
+    for key in edges:
+        
+        # Get the points
+        edge = key2edg(key)
+        
+        # Check with the neighboor
+        edges[key] = check_neighbour(edge,edges)
+        
+    return edges
+
+
+def check_neighbour(edge, edges):
+    
+    # get the first vertice
+    v1 = edge[0]
+    
+    # get the second vertice
+    v2 = edge[1]
+    
+    # Create empty lists
+    v1_neighbours = []
+    v2_neighbours = []
+    
+    # For each edges
+    for key in edges:
+        
+        # Get vertices of the current edge (e)
+        (ve_1,ve_2) = key2edg(key)
+        
+        # Check if ve_1 or ve_2 are in the neighbourhoods
+        if v1==ve_1:
+            v1_neighbours.append(ve_2)
+        if v1==ve_2:
+            v1_neighbours.append(ve_1)
+        if v2==ve_1:
+            v2_neighbours.append(ve_2)
+        if v2==ve_2:
+            v2_neighbours.append(ve_1)
+            
+    # Intersect
+    intersect = [v for v in v1_neighbours if v in v2_neighbours]
+    
+    return len(intersect) <= 2

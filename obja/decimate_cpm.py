@@ -18,21 +18,37 @@ class Decimater(obja.Model):
         # Create the dict with the edges
         edges = create_dict_edges(self.faces)
         
-        # Resolve the third condition -> Create a graph (nx lib) and check for cycle of length 4
+        # Check second condition
+        edges = check_second_condition(edges)
+        
+        # Check third condtition
+        
+        # Create list of collapsed vertices
+        collapsed_vertices = []
         
         # For each edges in the dict
-        
-            # Check if the number is < 3
-            
-            # Check is the edges is not in a cycle of 4 (we can just have a long list with all the edges in a cycle of 4)
-            
-            # Check if one point of the two (in the edge) have a link with an edge already collapsed
-            
-            # If collapsable : 
-            
-                # collapse the edge
+        for key,value in edges:
+    
+            # If second and third condition ok
+            if value:
                 
-                # Add p1 and p2 in a list -> for the third check
+                # Get the vertices of the edge
+                edge = key2edg(key)
+                
+                # Check if one of the two already collapsed
+                if edge[0] in collapsed_vertices or edge[1] in collapsed_vertices:
+                    pass
+                else:
+                    
+                    # Get the coord of the first vertex
+                    self.vertices[edge[0]]
+                    
+                    # Get the coord of the second vertex
+                    
+                    # Compute the average of the vertex
+                    
+                    # Collapse the edge
+
             
             
         
