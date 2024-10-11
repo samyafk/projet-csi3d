@@ -34,10 +34,14 @@ def key2edg(key: str) -> tuple:
 
 
 def create_dict_edges(faces):
-    """Create a list with all the edges reguarding a list of all the faces
+    """Create a dictionnay. The key are the edges with a format 'p1,p2'. And the value is a counter of the number of face
+    where (p1,p2) is in.
 
     Args:
-        faces (np.array): The list of all the faces of the model
+        faces (np.array): An array with all the faces 
+
+    Returns:
+        dict: A dict
     """
     
     # Creation of the dict
@@ -46,21 +50,25 @@ def create_dict_edges(faces):
     # Enumeration on all the faces
     for face in faces:
         
-        if {face.a,face.b} in edges_dic.keys():
-            edges_dic[{face.a,face.b}] += 1
-        else:
-            edges_dic[{face.a,face.b}] = 1
+        # Creation of a list with the points of the face
+        points = [face.a,face.b,face.c,face.a]
+        
+        # Enumeration on all the edges of the current face
+        for i in range(3):
             
-        if {face.b,face.c} in edges_dic.keys():
-            edges_dic[{face.b,face.c}] += 1
-        else:
-            edges_dic[{face.b,face.c}] = 1
+            # Creation of the associated key
+            key = edg2key(points[i],points[i+1])
             
+            # We check first if the edge is already represented in the dic
+            if key in edges_dic:
+                
+                # If already in the dict, we increment the counter
+                edges_dic[key] += 1
             
-        if {face.a,face.c} in edges_dic.keys():
-            edges_dic[{face.a,face.c}] += 1
-        else:
-            edges_dic[{face.a,face.c}] = 1
+            else :
+                
+                # In the other case, we create a new key and set the counter to 1
+                edges_dic[key] += 1
 
     # Return the list of edges
     return edges_dic
