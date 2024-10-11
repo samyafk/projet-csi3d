@@ -9,7 +9,7 @@ def create_list_edges(faces):
     edges = []
     
     # Enumeration on all the faces
-    for (face_index, face) in enumerate():
+    for (face_index, face) in enumerate(faces):
         
         # Append the first edge
         edges.append((face.a,face.b))
@@ -19,6 +19,9 @@ def create_list_edges(faces):
         
         # Append the third edge
         edges.append((face.a,face.c))
+        
+    # Return the list of edges
+    return edges
 
 
 
