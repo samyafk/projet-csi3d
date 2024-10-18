@@ -141,7 +141,7 @@ def vertex_tri(edge: list, edges: dict) -> tuple:
     
     if len(intersect) != 2:
         #TODO Gerer l'execption
-        raise("Uh oh!")
+        raise ValueError('Uh oh!')
     
     return intersect[0], intersect[1]
 
@@ -149,22 +149,25 @@ def vertex_tri(edge: list, edges: dict) -> tuple:
 # If that's the case, set all the edges of the quad to non collapsable
 def check_quad(edge: list, edges: dict):
     #FIXME optimiser les boucles de recherche de key/edge
-    w1, w2 = vertex_tri(edge, edges)
-    
-    w1_neighbours = neighbours(w1, edges)
-    w2_neighbours = neighbours(w2, edges)
-    
-    if len(w1_neighbours) == 4:
-        for i, j in range(4):
-            key = edg2key(w1_neighbours[i], w1_neighbours[j])
-            if key in edges.keys():
-                edges[key] = False
-    
-    if len(w2_neighbours) == 4:
-        for i, j in range(4):
-            key = edg2key(w2_neighbours[i], w2_neighbours[j])
-            if key in edges.keys():
-                edges[key] = False
+    try :
+        w1, w2 = vertex_tri(edge, edges)
+        
+        w1_neighbours = neighbours(w1, edges)
+        w2_neighbours = neighbours(w2, edges)
+        
+        if len(w1_neighbours) == 4:
+            for i, j in range(4):
+                key = edg2key(w1_neighbours[i], w1_neighbours[j])
+                if key in edges.keys():
+                    edges[key] = False
+        
+        if len(w2_neighbours) == 4:
+            for i, j in range(4):
+                key = edg2key(w2_neighbours[i], w2_neighbours[j])
+                if key in edges.keys():
+                    edges[key] = False
+    except :
+        pass 
 
 # Checks the third condition of the paper
 def check_third_condition(edges: dict):
