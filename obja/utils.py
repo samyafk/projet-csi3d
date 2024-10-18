@@ -84,6 +84,7 @@ def check_second_condition(edges):
 
 
 def check_neighbour(edge, edges):
+    # Checks that the two vertices of the edge only have two neighbours in common
     #FIXME fonction obselete (cf. neighbours)
     warn("fonction obselete (cf. neighbours) pour la mettre à jour", DeprecationWarning, stacklevel=2)
     
@@ -97,7 +98,7 @@ def check_neighbour(edge, edges):
     v1_neighbours = []
     v2_neighbours = []
     
-    # For each edges
+    # For each edge
     for key in edges:
         
         # Get vertices of the current edge (e)
@@ -118,6 +119,7 @@ def check_neighbour(edge, edges):
     
     return len(intersect) <= 2
 
+# Returns the neighbours of a given vertex
 def neighbours(vertex: int, edges: list) -> list:
     neighbours = []
     for e in edges:
@@ -128,7 +130,8 @@ def neighbours(vertex: int, edges: list) -> list:
         
     return neighbours
 
-
+# Checks that the two vertices of the edge only have 2 neighbours in common
+# and returns these neighbours
 def vertex_tri(edge: list, edges: dict) -> tuple:
     v1, v2 = edge[0], edge[1]
     v1_neighbours = neighbours(v1, edges)
@@ -142,7 +145,8 @@ def vertex_tri(edge: list, edges: dict) -> tuple:
     
     return intersect[0], intersect[1]
 
-
+# Checks if the neighbours are in the center of a quad
+# If that's the case, set all the edges of the quad to non collapsable
 def check_quad(edge: list, edges: dict):
     #FIXME optimiser les boucles de recherche de key/edge
     w1, w2 = vertex_tri(edge, edges)
@@ -161,3 +165,15 @@ def check_quad(edge: list, edges: dict):
             key = edg2key(w2_neighbours[i], w2_neighbours[j])
             if key in edges.keys():
                 edges[key] = False
+
+# Checks the third condition of the paper
+def check_third_condition(edges: dict):
+    
+    # For each edge
+    for key in edges:
+        
+        # Get the edge
+        edge = key2edg(key)
+        
+        # Use check_quad
+        check_quad(edge, edges)
