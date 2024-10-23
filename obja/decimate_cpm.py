@@ -12,6 +12,7 @@ class Decimater(obja.Model):
     def __init__(self):
         super().__init__()
         self.deleted_faces = set()
+        self.deleted_vertices = set()
 
     def contract(self, output):
         
@@ -67,7 +68,7 @@ class Decimater(obja.Model):
                             if edge[0] in [face.a,face.b,face.c] and edge[1] in [face.a,face.b,face.c]:
                                 self.deleted_faces.add(face_index)
                                 # Add the instruction to operations stack
-                                operations.append(('face', face_index, face))
+                                operations.append(('f', face_index, face))
                             elif edge[1] in [face.a,face.b,face.c]:
                                 if edge[1] == face.a:
                                     operations.append(('ef', face_index, face))
@@ -85,11 +86,42 @@ class Decimater(obja.Model):
                     
                     # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
                     operations.append(('v', edge[1], coordVert2))
+                    self.deleted_vertices.add(edge[1])
                     
-                    
-                        
 
+                    
+        # To rebuild the model, run operations in reverse order
+        operations.reverse()
+
+        # Write the result in output file
+        output_model = obja.Output(output, random_color=True)
+        
+        # Add remaining vertices
+        for (idx,v) in enumerate(self.vertices):
+            if idx not in self.deleted_vertices:
+                output_model.add_vertex(idx, v)
+                
+        # add remaining faces
+        for (idx,f) in enumerate(self.faces):
+            if idx not in self.deleted_faces:
+                output_model.add_face(idx, f)
+
+        
+        for (ty, index, value) in operations:
             
+            if ty == "v":
+                output_model.add_vertex(index, value)
+            elif ty == "f":
+                output_model.add_face(index, value)  
+            elif ty == "tv":
+                output_model.edit_vertex(index, self.vertices[index] - value)
+            elif ty == "ef":
+                output_model.edit_face(index, value)        
+            else:
+                output_model.edit_vertex(index, value)
+
+        
+        
             
         
         # operations = []
@@ -116,19 +148,7 @@ class Decimater(obja.Model):
         #     # Delete the vertex
         #     operations.append(('vertex', vertex_index, vertex))
 
-        # # To rebuild the model, run operations in reverse order
-        # operations.reverse()
-
-        # # Write the result in output file
-        # output_model = obja.Output(output, random_color=True)
-
-        # for (ty, index, value) in operations:
-        #     if ty == "vertex":
-        #         output_model.add_vertex(index, value)
-        #     elif ty == "face":
-        #         output_model.add_face(index, value)   
-        #     else:
-        #         output_model.edit_vertex(index, value)
+        
 
 def main():
     """

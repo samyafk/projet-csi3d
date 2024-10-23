@@ -295,7 +295,7 @@ class Output:
             print('ev {} {} {} {}'.format(index, vertex[0], vertex[1], vertex[2]), file=self.output)
         else:
             print('ev {} {} {} {}'.format(self.vertex_mapping[index] + 1, vertex[0], vertex[1], vertex[2]),
-                  file=self.output)
+                file=self.output)
 
     def add_face(self, index, face):
         """
