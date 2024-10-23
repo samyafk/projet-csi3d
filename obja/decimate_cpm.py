@@ -58,8 +58,8 @@ class Decimater(obja.Model):
                     # Get the coord of the second vertex
                     coordVert2 = self.vertices[edge[1]]
                     
-                    # Compute the mean of the vertex
-                    mean = (coordVert1 + coordVert2)/2
+                    # Compute the translation vector
+                    t = (coordVert2 - coordVert1)/2
                     
                     # Collapse the edge
                     for (face_index, face) in enumerate(self.faces):
@@ -81,8 +81,8 @@ class Decimater(obja.Model):
                                     face.c = edge[0]
                     
                     # Translate vertex1
-                    self.vertices[edge[0]] = mean
-                    operations.append(('tv', edge[0], coordVert1 - mean))
+                    self.vertices[edge[0]] = coordVert1 + t
+                    operations.append(('tv', edge[0], -t))
                     
                     # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
                     operations.append(('v', edge[1], coordVert2))
@@ -114,7 +114,7 @@ class Decimater(obja.Model):
             elif ty == "f":
                 output_model.add_face(index, value)  
             elif ty == "tv":
-                output_model.edit_vertex(index, self.vertices[index] - value)
+                output_model.edit_vertex(index, self.vertices[index] + value)
             elif ty == "ef":
                 output_model.edit_face(index, value)        
             else:
