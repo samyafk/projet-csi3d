@@ -4,6 +4,7 @@ import obja
 import numpy as np
 import sys
 from utils import *
+from obja import Face
 
 class Decimater(obja.Model):
     """
@@ -70,14 +71,12 @@ class Decimater(obja.Model):
                                 # Add the instruction to operations stack
                                 operations.append(('f', face_index, face))
                             elif edge[1] in [face.a,face.b,face.c]:
+                                operations.append(('ef', face_index, Face(face.a, face.b, face.c)))
                                 if edge[1] == face.a:
-                                    operations.append(('ef', face_index, face))
                                     face.a = edge[0]
                                 elif edge[1] == face.b:
-                                    operations.append(('ef', face_index, face))
                                     face.b = edge[0]
                                 elif edge[1] == face.c:
-                                    operations.append(('ef', face_index, face))
                                     face.c = edge[0]
                     
                     # Translate vertex1
