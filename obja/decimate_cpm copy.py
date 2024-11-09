@@ -4,6 +4,7 @@ import obja
 import numpy as np
 import sys
 from utils import *
+from transcriptionTable import *
 from obja import Face
 
 class Decimater(obja.Model):
@@ -25,6 +26,7 @@ class Decimater(obja.Model):
         # Number of iterations
         self.nbrIteration = nbrIteration
         
+        
         # List of list that have the evolution of the remaining faces through the iterations
         # 0 will indiq that the face is not here in this iteration
         # 1 will indiq that the face is again here
@@ -32,6 +34,10 @@ class Decimater(obja.Model):
         
         # At the creation, all the face are here
         self.faceEvolution.append(np.ones(len(self.faces)))
+        
+        # Create the transcription table for the faces and the vertexs
+        self.tableFace = TranscriptionTable("Face",len(self.faces))
+        self.tableVertex = TranscriptionTable("Vertex",len(self.vertices))
         
         #self.deleted_faces = set()
         self.deleted_vertices = set()
