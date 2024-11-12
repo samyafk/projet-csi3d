@@ -1,5 +1,8 @@
 from transcriptionTable import *
 from obja import *
+import random
+from tqdm import tqdm
+
 
 class IndexPointExceedError(Exception):
     def __init__(self, message="Too much point reguarding the inital number of points value"):
@@ -24,14 +27,14 @@ class Writter(object):
         
     def incrementPointCounter(self):
         # Exceed Gesture
-        if self.pointCounter == len(self.pointCounter):
+        if self.pointCounter == self.pointTable.len():
             raise IndexPointExceedError()
         else:
             self.pointCounter += 1
             
     def incrementFaceCounter(self):
         # Exceed gesture
-        if self.faceCounter == len(self.faceCounter):
+        if self.faceCounter == self.faceTable.len():
             raise IndexFaceExceedError()
         else:
             self.faceCounter += 1
@@ -83,6 +86,9 @@ class Writter(object):
         # Add the operation into the operation list
         self.operations.append(('ef',indexObja,newValue))
         
+    def operation_change_color_faces(self):
+        return None
+        
     def __faceIndexModel_2_faceObjaModel(self,face:Face):
         
         a = self.pointTable.getObjaInd(face.a)
@@ -110,7 +116,7 @@ class Writter(object):
     def __edit_vertex_ouput(self,indexObja:int,vertex:list):
         print('ev {} {} {} {}'.format(indexObja+1,vertex[0], vertex[1], vertex[2]), file=self.outputFile)
         
-    def __edit_face_output(self,indexObja:int,face:Face):
+    def __edit_face_output(self,indexObja:int,face:Face,color:list=None):
         
         # First, in the face, it's the index of the model. We need to convert thoses index into obja index
         pointFaceObja = self.__faceIndexModel_2_faceObjaModel(self,face)
@@ -118,23 +124,32 @@ class Writter(object):
         # The add the face into the output file
         print('ef {} {} {} {}'.format(indexObja+1,pointFaceObja[0], pointFaceObja[1], pointFaceObja[2]), file=self.outputFile)
         
+        # Add color to the face
+        if color != None:
+            print('fc {} {} {} {}'.format(indexObja+1,color[0],color[1],color[2],file=self.outputFile))
+        
         
     def write_output(self):
+        
+        print("Start writing the output file \n")
         
         # First, check if the two table are bijective
         self.faceTable.isBijective()
         self.pointTable.isBijective()
         
+        # Now defind a color for the faces
+        color = [random.uniform(0, 1),random.uniform(0, 1),random.uniform(0, 1)]
+        
         # Then, reverse the operations list
         reverseOperations = self.operation[::-1]
         
         # Finally, add all the link in the output file
-        for (ty, indexObja, value) in reverseOperations:
+        for (ty, indexObja, value) in tqdm(reverseOperations):
             
             if ty == "v":
                 self.__add_vertex_output(value)
             elif ty == "f":
-                self.__add_face_output(indexObja, value)  
+                self.__add_face_output(indexObja, value,color)  
             elif ty == "ev":
                 self.__edit_vertex_ouput(indexObja, value)
             elif ty == "ef":

@@ -44,7 +44,7 @@ class TranscriptionTable(object):
     def getModelInd(self, obja: int):
         matching_indices = [index for index, value in enumerate(self.table) if value == obja]
         if len(matching_indices) == 0:
-            raise ObjaNotFoundError(obja, "No model index corresponds to the provided object index")
+            raise ModelNotFoundError(obja, "No model index corresponds to the provided object index")
         elif len(matching_indices) > 1:
             raise ValueError(f"Multiple model indices found for object index {obja}: {matching_indices}")
         else:
@@ -60,6 +60,13 @@ class TranscriptionTable(object):
             raise TableNotBijectiveError(self.name, "Table has duplicate obja values and is not bijective")
         
         print(f"The table '{self.name}' is bijective.")
+        
+    def len(self):
+        return len(self.table)
+    
+    def getNumberOfUndefinedLink(self):
+        # Return the number of None in the table
+        return np.sum([1 for item in self.table if item is None])
 
 def main():
     table = TranscriptionTable("Suzanne", 5)

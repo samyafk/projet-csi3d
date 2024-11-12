@@ -6,6 +6,8 @@ import sys
 from utils import *
 from transcriptionTable import *
 from obja import Face
+from writter import *
+from tqdm import tqdm
 
 class Decimater(obja.Model):
     """
@@ -20,9 +22,6 @@ class Decimater(obja.Model):
         # Reading of the object
         self.parse_file('example/'+filename)
         
-        # Operations
-        self.operation = []
-        
         # Number of iterations
         self.nbrIteration = nbrIteration
         
@@ -34,6 +33,9 @@ class Decimater(obja.Model):
         
         # At the creation, all the face are here
         self.faceEvolution.append(np.ones(len(self.faces)))
+        
+        # Create the writter
+        self.writter = Writter(filename,len(self.vertices),len(self.faces))
         
         # Create the transcription table for the faces and the vertexs
         self.tableFace = TranscriptionTable("Face",len(self.faces))
@@ -129,13 +131,15 @@ class Decimater(obja.Model):
                                 self.faceEvolution[currentIteration+1][face_index] = 0
                                 
                                 # Add the instruction to operations stack (Create a new face)
-                                self.operation.append(('f', face_index, face))
+                                print("Add face : " + str(face_index) + "\n")
+                                self.writter.operation_add_face(face_index,face)
                                 
                             # Check if the edge[1] is in the face
                             elif edge[1] in [face.a,face.b,face.c]:
                                 
                                 # Translate the face
-                                self.operation.append(('ef', face_index, Face(face.a, face.b, face.c)))
+                                print("Edit face : " + str(face_index) + "\n")
+                                self.writter.operation_edit_face(face_index,Face(face.a, face.b, face.c))
                                 
                                 # Check which vertex is the edge[1] and translate it
                                 if edge[1] == face.a:
@@ -150,10 +154,12 @@ class Decimater(obja.Model):
                     
                     # Translate vertex1
                     self.vertices[edge[0]] = self.vertices[v1] + t
-                    self.operation.append(('tv', edge[0], -t))
+                    print("Edit vertex : " + str(edge[0]) + "\n")
+                    self.writter.operation_edit_vertex(edge[0],self.vertices[v1] -t)
                     
                     # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
-                    self.operation.append(('v', edge[1], self.vertices[v2]))
+                    self.writter.operation_add_vertex(edge[1],self.vertices[v2])
+                    print("Add vertex : " + str(edge[1]) + "\n")
                     self.deleted_vertices.add(edge[1])
                     
         return None
@@ -179,56 +185,18 @@ class Decimater(obja.Model):
         return edges
             
     def error(self):
-        return None
-    
-    def write_obja(self,output):
-        
-        print((self.operation))
-        
-        # To rebuild the model, run operations in reverse order
-        reverseOperations = self.operation[::-1]
-
-        # Write the result in output file
-        output_model = obja.Output(output, random_color=True)
-        
-        # Add remaining vertices
-        for (idx,v) in enumerate(self.vertices):
-            if idx not in self.deleted_vertices:
-                output_model.add_vertex(idx, v)
-                
-        # add remaining faces
-        for (face_index,present) in enumerate(self.faceEvolution[-1]):
-            if present:
-                
-                # Get the face
-                face = self.faces[face_index]
-                output_model.add_face(idx, face)
-
-        
-        for (ty, index, value) in reverseOperations:
-            
-            if ty == "v":
-                output_model.add_vertex(index, value)
-            elif ty == "f":
-                output_model.add_face(index, value)  
-            elif ty == "tv":
-                output_model.edit_vertex(index, self.vertices[index] + value)
-            elif ty == "ef":
-                output_model.edit_face(index, value)        
-            else:
-                output_model.edit_vertex(index, value)
-        return None
+        return None   
     
     def compression_algorithm(self,output):
         
         # Run the compression
         for i in range(self.nbrIteration):
-            print(sum(self.faceEvolution[i]))
+            print("Number of faces :" + str(sum(self.faceEvolution[i])) + "\n")
             self.reduce_face(i)
             
             
         # Write the obja file
-        self.write_obja(output)
+        self.writter.write_output()
         
         return None
 
