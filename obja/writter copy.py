@@ -42,49 +42,49 @@ class Writter(object):
     
     def operation_add_vertex(self,indexModel:int,value:list):
         
-        # # First we need to create a link in the transcription table
-        # self.pointTable.addLink(indexModel,self.pointCounter)
+        # First we need to create a link in the transcription table
+        self.pointTable.addLink(indexModel,self.pointCounter)
         
-        # # We increment the pointCounter variable as this index is already taken
-        # self.incrementPointCounter()
+        # We increment the pointCounter variable as this index is already taken
+        self.incrementPointCounter()
         
-        # # Get the index value in the obja file
-        # indexObja = self.pointTable.getObjaInd(indexModel)
+        # Get the index value in the obja file
+        indexObja = self.pointTable.getObjaInd(indexModel)
         
         # Add the operation into the operation list
-        self.operations.append(('v',indexModel, value))
+        self.operations.append(('v',indexObja, value))
     
     def operation_add_face(self,indexModel:int,value:Face):
         
-        # # First we need to create a link in the transcription table
-        # self.faceTable.addLink(indexModel,self.faceCounter)
+        # First we need to create a link in the transcription table
+        self.faceTable.addLink(indexModel,self.faceCounter)
         
-        # # We increment the pointCounter variable as this index is already taken
-        # self.incrementFaceCounter()
+        # We increment the pointCounter variable as this index is already taken
+        self.incrementFaceCounter()
         
-        # # Get the index value in the obja file
-        # indexObja = self.faceTable.getObjaInd(indexModel)
+        # Get the index value in the obja file
+        indexObja = self.faceTable.getObjaInd(indexModel)
         
         # Add the operation into the operation list
-        self.operations.append(('f',indexModel, value))
+        self.operations.append(('v',indexObja, value))
         
         return None
     
     def operation_edit_vertex(self,indexModel:int,newValue:list):
         
-        # # Get the corresponding index
-        # indexObja = self.pointTable.getObjaInd(indexModel)
+        # Get the corresponding index
+        indexObja = self.pointTable.getObjaInd(indexModel)
         
         # Add the opertaion into the operation list
-        self.operations.append(('ev',indexModel,newValue))
+        self.operations.append(('ev',indexObja,newValue))
     
     def operation_edit_face(self, indexModel:int,newValue:Face):
         
-        # # Get the corresponding index
-        # indexObja = self.faceTable.getObjaInd(indexModel)
+        # Get the corresponding index
+        indexObja = self.faceTable.getObjaInd(indexModel)
         
         # Add the operation into the operation list
-        self.operations.append(('ef',indexModel,newValue))
+        self.operations.append(('ef',indexObja,newValue))
         
     def operation_change_color_faces(self):
         return None
@@ -98,26 +98,10 @@ class Writter(object):
         return [a,b,c]
         
         
-    def __add_vertex_output(self,indexModel:int, vertex:list):
-        
-        # First we need to create a link in the transcription table
-        self.pointTable.addLink(indexModel,self.pointCounter)
-        
-        # We increment the pointCounter variable as this index is already taken
-        self.incrementPointCounter()
-        
+    def __add_vertex_output(self, vertex:list):
         print('v {} {} {}'.format(vertex[0], vertex[1], vertex[2]), file=self.outputFile)
         
-    def __add_face_output(self,indexModel:int,face:Face,color:list=None):
-        
-        # First we need to create a link in the transcription table
-        self.faceTable.addLink(indexModel,self.faceCounter)
-        
-        # We increment the pointCounter variable as this index is already taken
-        self.incrementFaceCounter()
-        
-        # Get the index value in the obja file
-        indexObja = self.faceTable.getObjaInd(indexModel)
+    def __add_face_output(self,indexObja:int,face:Face,color:list=None):
         
         # First, in the face, it's the index of the model. We need to convert thoses index into obja index
         pointFaceObja = self.__faceIndexModel_2_faceObjaModel(self,face)
@@ -129,17 +113,10 @@ class Writter(object):
         if color != None:
             print('fc {} {} {} {}'.format(indexObja+1,color[0],color[1],color[2],file=self.outputFile))
                     
-    def __edit_vertex_ouput(self,indexModel:int,vertex:list):
-        
-        # Get the corresponding index
-        indexObja = self.pointTable.getObjaInd(indexModel)
-        
+    def __edit_vertex_ouput(self,indexObja:int,vertex:list):
         print('ev {} {} {} {}'.format(indexObja+1,vertex[0], vertex[1], vertex[2]), file=self.outputFile)
         
-    def __edit_face_output(self,indexModel:int,face:Face,color:list=None):
-        
-        # Get the corresponding index
-        indexObja = self.faceTable.getObjaInd(indexModel)
+    def __edit_face_output(self,indexObja:int,face:Face,color:list=None):
         
         # First, in the face, it's the index of the model. We need to convert thoses index into obja index
         pointFaceObja = self.__faceIndexModel_2_faceObjaModel(self,face)
@@ -167,16 +144,16 @@ class Writter(object):
         reverseOperations = self.operation[::-1]
         
         # Finally, add all the link in the output file
-        for (ty, indexModel, value) in tqdm(reverseOperations):
+        for (ty, indexObja, value) in tqdm(reverseOperations):
             
             if ty == "v":
-                self.__add_vertex_output(indexModel,value)
+                self.__add_vertex_output(value)
             elif ty == "f":
-                self.__add_face_output(indexModel, value,color)  
+                self.__add_face_output(indexObja, value,color)  
             elif ty == "ev":
-                self.__edit_vertex_ouput(indexModel, value)
+                self.__edit_vertex_ouput(indexObja, value)
             elif ty == "ef":
-                self.__edit_face_output(indexModel, value)        
+                self.__edit_face_output(indexObja, value)        
             else:
                 raise SyntaxError("Too understand the type")
             
