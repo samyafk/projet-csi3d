@@ -30,6 +30,9 @@ class TranscriptionTable(object):
         self.name = name
         self.table = np.full(nbrOfObject, fill_value=None)
         
+    def __repr__(self):
+        return f"TranscriptionTable(name={self.name}, table={self.table})"
+        
     def addLink(self, model: int, obja: int):
         if self.table[model] is not None:
             print("Warning, a link is already added")
