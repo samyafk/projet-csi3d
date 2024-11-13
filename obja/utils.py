@@ -1,4 +1,5 @@
 from warnings import warn
+import numpy as np
 
 def edg2key(p1:int,p2:int)->str:
     """Create a str key with two points
