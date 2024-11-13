@@ -156,10 +156,6 @@ class Writter(object):
         
         print("Start writing the output file \n")
         
-        # First, check if the two table are bijective
-        self.faceTable.isBijective()
-        self.pointTable.isBijective()
-        
         # Now defind a color for the faces
         color = [random.uniform(0, 1),random.uniform(0, 1),random.uniform(0, 1)]
         
@@ -179,6 +175,10 @@ class Writter(object):
                 self.__edit_face_output(indexModel, value)        
             else:
                 raise SyntaxError("Too understand the type")
+            
+        # Finnally, check if the two table are bijective
+        self.faceTable.isBijective()
+        self.pointTable.isBijective()
             
         print("Ouput File sucesfully write !")
         
