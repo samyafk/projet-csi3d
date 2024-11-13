@@ -87,8 +87,8 @@ class Writter(object):
         # Add the operation into the operation list
         self.operations.append(('ef',indexModel,newValue))
         
-    def operation_change_color_faces(self):
-        return None
+    def operation_change_color_faces(self,color:list):
+        self.operations.append(('color',0,color))
         
     def __faceIndexModel_2_faceObjaModel(self,face:Face):
         
@@ -175,7 +175,9 @@ class Writter(object):
                 elif ty == "ev":
                     self.__edit_vertex_ouput(indexModel, value)
                 elif ty == "ef":
-                    self.__edit_face_output(indexModel, value)        
+                    self.__edit_face_output(indexModel, value)   
+                elif ty == "color":
+                    color = value     
                 else:
                     raise SyntaxError("Too understand the type")
             
