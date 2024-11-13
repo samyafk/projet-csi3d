@@ -128,7 +128,7 @@ class Writter(object):
         
         # Add color to the face
         if color != None:
-            print('fc {} {} {} {}'.format(indexObja+1,color[0],color[1],color[2],file=self.outputFile))
+            print('fc {} {} {} {}'.format(indexObja+1,color[0],color[1],color[2]),file=self.outputFile)
                     
     def __edit_vertex_ouput(self,indexModel:int,vertex:list):
         
@@ -150,7 +150,7 @@ class Writter(object):
         
         # Add color to the face
         if color != None:
-            print('fc {} {} {} {}'.format(indexObja+1,color[0],color[1],color[2],file=self.outputFile))
+            print('fc {} {} {} {}'.format(indexObja+1,color[0],color[1],color[2]),file=self.outputFile)
         
         
     def write_output(self):
