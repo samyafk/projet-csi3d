@@ -41,7 +41,7 @@ class Decimater(obja.Model):
         self.tableFace = TranscriptionTable("Face",len(self.faces))
         self.tableVertex = TranscriptionTable("Vertex",len(self.vertices))
         
-        #self.deleted_faces = set()
+        self.deleted_faces = set()
         self.deleted_vertices = set()
         
     def retrieveFaces(self,currentIteration:int):
@@ -70,7 +70,7 @@ class Decimater(obja.Model):
             
         return t
         
-         
+        
     def reduce_face(self,currentIteration:int):
         """
         Goinng through one iteration of the squeeze method
@@ -91,6 +91,8 @@ class Decimater(obja.Model):
         # Create list of collapsed vertices
         collapsed_vertices = []
         
+        # TODO : Sort edges by error metric
+        
         # For each edges in the dict
         for key in edges:
             
@@ -107,11 +109,11 @@ class Decimater(obja.Model):
                     pass
                 else:
                     
-                    #FIXME ajouter le cas de la pondération à plus de 2 points
+                    #TODO ajouter le cas de la pondération à plus de 2 points
                     # Get the index of the two vertices and add it into the collapsed_vertices list
                     v1 = edge[0]; collapsed_vertices.append(v1)
                     v2 = edge[1]; collapsed_vertices.append(v2)
-                              
+                    
                     # Compute the translation
                     t = self.computeTranslation([v1,v2],'mean')
 
@@ -129,7 +131,7 @@ class Decimater(obja.Model):
                                 
                                 # Add 0 to the index of face_index (the face is deleted for the next iteration)
                                 self.faceEvolution[currentIteration+1][face_index] = 0
-                                
+
                                 # Add the instruction to operations stack (Create a new face)
                                 print("Add face : " + str(face_index) + "\n")
                                 self.writter.operation_add_face(face_index,face)
@@ -187,7 +189,7 @@ class Decimater(obja.Model):
     def error(self):
         return None   
     
-    def compression_algorithm(self,output):
+    def compression_algorithm(self):
         
         # Run the compression
         for i in range(self.nbrIteration):
@@ -195,17 +197,19 @@ class Decimater(obja.Model):
             self.reduce_face(i)
             
         # Add the remaining point and faces
-        # Add remaining vertices
-        for (idx,v) in enumerate(self.vertices):
-            if idx not in self.deleted_vertices:
-                self.writter.operation_add_vertex(idx, v)
-                
+        
         # add remaining faces
         for (idx,f) in enumerate(self.faces):
             if idx not in self.deleted_faces:
+                print("Add face : " + str(idx) + "\n")
                 self.writter.operation_add_face(idx, f)
             
-            
+        # Add remaining vertices
+        for (idx,v) in enumerate(self.vertices):
+            if idx not in self.deleted_vertices:
+                print("Add vertex : " + str(idx) + "\n")
+                self.writter.operation_add_vertex(idx, v)
+                
         # Write the obja file
         self.writter.write_output()
         
@@ -219,13 +223,12 @@ def main():
     # Number of iterations
     nbrIteration = 1
     
-    filename = 'suzanne.obj'
+    filename = 'cube.obj'
     np.seterr(invalid = 'raise')
     
     model = Decimater(filename,nbrIteration)
     
-    with open('example/'+filename+'a', 'w') as output:
-        model.compression_algorithm(output)
+    model.compression_algorithm()
 
 
 if __name__ == '__main__':

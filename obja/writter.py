@@ -120,6 +120,10 @@ class Writter(object):
         # Get the index value in the obja file
         indexObja = self.faceTable.getObjaInd(indexModel)
         
+        print(indexModel)
+        print(self.pointTable)
+        print(self.faceTable)
+        print(face)
         # First, in the face, it's the index of the model. We need to convert thoses index into obja index
         pointFaceObja = self.__faceIndexModel_2_faceObjaModel(face)
         

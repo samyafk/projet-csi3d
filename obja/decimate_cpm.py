@@ -171,9 +171,8 @@ class Decimater(obja.Model):
                     
                     # Collapse the edge
                     for (face_index, face) in enumerate(self.faces):
-                        
-                        # Check if the face in the remaining_faces
-                        if face in remaining_faces:
+                        # Delete any face related to this edge
+                        if face_index not in self.deleted_faces:
                             
                             # Delete any face related to this edge
                             if edge[0] in [face.a,face.b,face.c] and edge[1] in [face.a,face.b,face.c]:
@@ -192,7 +191,6 @@ class Decimater(obja.Model):
                                 
                                 # Check which vertex is the edge[1] and translate it
                                 if edge[1] == face.a:
-                                    self.faces[face_index].a = edge[0]
                                     face.a = edge[0]
                                 elif edge[1] == face.b:
                                     face.b = edge[0]
@@ -214,12 +212,12 @@ class Decimater(obja.Model):
         operations = []
         
         i=0
-        while i < 5:
+        while i < 2:
 
             # The difference between self.faces and self.deleted_faces
             remaining_faces = set([face for (idx, face) in enumerate(self.faces) if idx not in self.deleted_faces])
             
-            currentOperations = Decimater.iterate_faces_new(self,remaining_faces)
+            currentOperations = Decimater.iterate_faces_new(self,self.faces)
             i+=1
             
             operations = operations + currentOperations
