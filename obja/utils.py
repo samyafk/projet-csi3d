@@ -248,3 +248,5 @@ def calculate_error_metrics(edges: dict, faces: list):
         new_vertex_homogeneous = np.append(new_vertex, 1)
         error_metric = new_vertex_homogeneous @ Q @ new_vertex_homogeneous  # error_metric = new_vertex.T * Q * new_vertex
         error_metrics[key] = error_metric
+        
+    return error_metrics
