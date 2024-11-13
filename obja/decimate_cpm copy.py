@@ -194,6 +194,17 @@ class Decimater(obja.Model):
             print("Number of faces :" + str(sum(self.faceEvolution[i])) + "\n")
             self.reduce_face(i)
             
+        # Add the remaining point and faces
+        # Add remaining vertices
+        for (idx,v) in enumerate(self.vertices):
+            if idx not in self.deleted_vertices:
+                self.writter.operation_add_vertex(idx, v)
+                
+        # add remaining faces
+        for (idx,f) in enumerate(self.faces):
+            if idx not in self.deleted_faces:
+                self.writter.operation_add_face(idx, f)
+            
             
         # Write the obja file
         self.writter.write_output()
