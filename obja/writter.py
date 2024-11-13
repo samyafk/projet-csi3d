@@ -166,7 +166,7 @@ class Writter(object):
         with open(self.outputFile+'a', 'w') as self.outputFile:
         
             # Finally, add all the link in the output file
-            for (ty, indexModel, value) in tqdm(reverseOperations):
+            for (ty, indexModel, value) in tqdm(reverseOperations,desc="Écriture dans le fichier"):
                 
                 if ty == "v":
                     self.__add_vertex_output(indexModel,value)
@@ -193,10 +193,10 @@ def main():
     print('test')
         
     # First read the cube.obj file
-    model = parse_file('example/cube.obj')
+    model = parse_file('example/suzanne.obj')
         
     # Create a writter
-    writer = Writter('example/test.obj',len(model.vertices),len(model.faces))
+    writer = Writter('example/prout.obj',len(model.vertices),len(model.faces))
          
     # Add the points and the faces into the operation list
     for (indexModel,face) in enumerate(model.faces):
