@@ -2,6 +2,7 @@ from transcriptionTable import *
 from obja import *
 import random
 from tqdm import tqdm
+from obja import *
 
 
 class IndexPointExceedError(Exception):
@@ -113,14 +114,14 @@ class Writter(object):
         # First we need to create a link in the transcription table
         self.faceTable.addLink(indexModel,self.faceCounter)
         
-        # We increment the pointCounter variable as this index is already taken
+        # We increment the faceCounter variable as this index is already taken
         self.incrementFaceCounter()
         
         # Get the index value in the obja file
         indexObja = self.faceTable.getObjaInd(indexModel)
         
         # First, in the face, it's the index of the model. We need to convert thoses index into obja index
-        pointFaceObja = self.__faceIndexModel_2_faceObjaModel(self,face)
+        pointFaceObja = self.__faceIndexModel_2_faceObjaModel(face)
         
         # The add the face into the output file
         print('f {} {} {}'.format(pointFaceObja[0], pointFaceObja[1], pointFaceObja[2]), file=self.outputFile)
@@ -160,21 +161,23 @@ class Writter(object):
         color = [random.uniform(0, 1),random.uniform(0, 1),random.uniform(0, 1)]
         
         # Then, reverse the operations list
-        reverseOperations = self.operation[::-1]
+        reverseOperations = self.operations[::-1]
         
-        # Finally, add all the link in the output file
-        for (ty, indexModel, value) in tqdm(reverseOperations):
-            
-            if ty == "v":
-                self.__add_vertex_output(indexModel,value)
-            elif ty == "f":
-                self.__add_face_output(indexModel, value,color)  
-            elif ty == "ev":
-                self.__edit_vertex_ouput(indexModel, value)
-            elif ty == "ef":
-                self.__edit_face_output(indexModel, value)        
-            else:
-                raise SyntaxError("Too understand the type")
+        with open(self.outputFile+'a', 'w') as self.outputFile:
+        
+            # Finally, add all the link in the output file
+            for (ty, indexModel, value) in tqdm(reverseOperations):
+                
+                if ty == "v":
+                    self.__add_vertex_output(indexModel,value)
+                elif ty == "f":
+                    self.__add_face_output(indexModel, value, color)  
+                elif ty == "ev":
+                    self.__edit_vertex_ouput(indexModel, value)
+                elif ty == "ef":
+                    self.__edit_face_output(indexModel, value)        
+                else:
+                    raise SyntaxError("Too understand the type")
             
         # Finnally, check if the two table are bijective
         self.faceTable.isBijective()
@@ -182,3 +185,29 @@ class Writter(object):
             
         print("Ouput File sucesfully write !")
         
+        
+def main():
+        
+    print('test')
+        
+    # First read the cube.obj file
+    model = parse_file('example/cube.obj')
+        
+    # Create a writter
+    writer = Writter('example/test.obj',len(model.vertices),len(model.faces))
+         
+    # Add the points and the faces into the operation list
+    for (indexModel,face) in enumerate(model.faces):
+        writer.operation_add_face(indexModel,face)
+        
+    for (indexModel,vertice) in enumerate(model.vertices):
+        writer.operation_add_vertex(indexModel,vertice)
+        
+    # Finally write into the output file
+    writer.write_output()
+    
+    print('Test successfuly done')   
+    
+if __name__ == '__main__':
+    print("Main")
+    main()
