@@ -50,29 +50,11 @@ class Decimater(obja.Model):
             array: array of the remaining faces according to the iteration number
         """
         return [array for array, binary in zip(self.faces, self.faceEvolution[currentIteration]) if binary == 1]
-    
-    
-    def computeTranslation(self,listVertices:list,TYPE:str='mean') -> np.array:
-        
-
-        # Get the coord of the first vertex
-        coordVert1 = self.vertices[listVertices[0]]
-                    
-        # Get the coord of the second vertex
-        coordVert2 = self.vertices[listVertices[1]]
-                    
-        # Compute the translation vector
-        t = (coordVert2 - coordVert1)/2
-            
-        return t
         
          
     def reduce_face(self,currentIteration:int) -> None:
         """
         Goinng through one iteration of the squeeze method
-
-        Returns:
-            _type_: _description_
         """
         
         # Retrieve the remaining faces for the current iteration
@@ -109,7 +91,7 @@ class Decimater(obja.Model):
                     v2 = edge[1]; collapsed_vertices.append(v2)
                               
                     # Compute the translation
-                    t = self.computeTranslation([v1,v2],'mean')
+                    t = computeTranslation([v1,v2],'mean')
 
                     # Collapse the edge
                     for (face_index,present) in enumerate(self.faceEvolution[currentIteration]):
@@ -161,9 +143,6 @@ class Decimater(obja.Model):
     def conditions(self,faces:list) -> dict:
         """
         Create the dictionnary of the edges and checks the conditions
-
-        Returns:
-            _type_: _description_
         """
         
         # Create the dict with the edges
