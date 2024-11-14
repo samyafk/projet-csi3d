@@ -1,3 +1,6 @@
+import numpy as np
+from utils import key2edg
+
 # Calculate the plane equation coefficients from three points
 def calculate_plane(p1, p2, p3):
     # Calculate two directional vectors

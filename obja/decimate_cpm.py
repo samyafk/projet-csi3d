@@ -2,10 +2,9 @@
 
 import obja
 import numpy as np
-import sys
 from utils import *
 from transcriptionTable import *
-from obja import Face
+from obja import *
 from writer import *
 from tqdm import tqdm
 
@@ -15,8 +14,6 @@ class Decimater(obja.Model):
     """
     def __init__(self,filename:str,nbrIteration:int):
         
-        # self.faces -> List
-        # self.vertices -> List
         super().__init__()
         
         # Reading of the object
@@ -54,7 +51,7 @@ class Decimater(obja.Model):
          
     def reduce_face(self,currentIteration:int) -> None:
         """
-        Goinng through one iteration of the squeeze method
+        Going through one iteration of the squeeze method
         """
         
         # Retrieve the remaining faces for the current iteration
@@ -89,9 +86,13 @@ class Decimater(obja.Model):
                     # Get the index of the two vertices and add it into the collapsed_vertices list
                     v1 = edge[0]; collapsed_vertices.append(v1)
                     v2 = edge[1]; collapsed_vertices.append(v2)
+                    
+                    # Get the coord of the vertices
+                    coordVert1 = self.vertices[v1]
+                    coordVert2 = self.vertices[v2]
                               
                     # Compute the translation
-                    t = computeTranslation([v1,v2],'mean')
+                    t = (coordVert1 - coordVert2)/2
 
                     # Collapse the edge
                     for (face_index,present) in enumerate(self.faceEvolution[currentIteration]):

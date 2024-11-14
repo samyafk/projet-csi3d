@@ -182,15 +182,8 @@ def check_third_condition(edges: dict):
         # Use check_quad
         check_quad(edge, edges)
 
-def computeTranslation(self,listVertices:list,TYPE:str='mean') -> np.array:
-        
-        # Get the coord of the first vertex
-        coordVert1 = self.vertices[listVertices[0]]
-                    
-        # Get the coord of the second vertex
-        coordVert2 = self.vertices[listVertices[1]]
-                    
-        # Compute the translation vector
-        t = (coordVert2 - coordVert1)/2
-            
-        return t
+def computeTranslation(v1:np.array,v2:np.array,TYPE:str='mean') -> np.array:                    
+    """
+    Compute the translation vector between v1 and v2
+    """      
+    return (v1 - v2)/2
