@@ -15,7 +15,7 @@ class IndexFaceExceedError(Exception):
         self.message = f"{message}"
         super().__init__(self.message)
 
-class Writter(object):
+class Writer(object):
     
     def __init__(self,outputFile:str,nbrPoints:int,nbrFaces:int):
         self.operations = []
@@ -195,8 +195,8 @@ def main():
     # First read the cube.obj file
     model = parse_file('example/suzanne.obj')
         
-    # Create a writter
-    writer = Writter('example/prout.obj',len(model.vertices),len(model.faces))
+    # Create a writer
+    writer = Writer('example/prout.obj',len(model.vertices),len(model.faces))
          
     # Add the points and the faces into the operation list
     for (indexModel,face) in enumerate(model.faces):

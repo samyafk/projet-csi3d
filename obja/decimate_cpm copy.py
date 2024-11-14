@@ -6,7 +6,7 @@ import sys
 from utils import *
 from transcriptionTable import *
 from obja import Face
-from writter import *
+from obja.writer import *
 from tqdm import tqdm
 
 class Decimater(obja.Model):
@@ -34,8 +34,8 @@ class Decimater(obja.Model):
         # At the creation, all the face are here
         self.faceEvolution.append(np.ones(len(self.faces)))
         
-        # Create the writter
-        self.writter = Writter(filename,len(self.vertices),len(self.faces))
+        # Create the writer
+        self.writer = Writer(filename,len(self.vertices),len(self.faces))
         
         # Create the transcription table for the faces and the vertexs
         self.tableFace = TranscriptionTable("Face",len(self.faces))
@@ -132,14 +132,14 @@ class Decimater(obja.Model):
                                 
                                 # Add the instruction to operations stack (Create a new face)
                                 print("Add face : " + str(face_index) + "\n")
-                                self.writter.operation_add_face(face_index,face)
+                                self.writer.operation_add_face(face_index,face)
                                 
                             # Check if the edge[1] is in the face
                             elif edge[1] in [face.a,face.b,face.c]:
                                 
                                 # Translate the face
                                 print("Edit face : " + str(face_index) + "\n")
-                                self.writter.operation_edit_face(face_index,Face(face.a, face.b, face.c))
+                                self.writer.operation_edit_face(face_index,Face(face.a, face.b, face.c))
                                 
                                 # Check which vertex is the edge[1] and translate it
                                 if edge[1] == face.a:
@@ -155,10 +155,10 @@ class Decimater(obja.Model):
                     # Translate vertex1
                     self.vertices[edge[0]] = self.vertices[v1] + t
                     print("Edit vertex : " + str(edge[0]) + "\n")
-                    self.writter.operation_edit_vertex(edge[0],self.vertices[v1] -t)
+                    self.writer.operation_edit_vertex(edge[0],self.vertices[v1] -t)
                     
                     # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
-                    self.writter.operation_add_vertex(edge[1],self.vertices[v2])
+                    self.writer.operation_add_vertex(edge[1],self.vertices[v2])
                     print("Add vertex : " + str(edge[1]) + "\n")
                     self.deleted_vertices.add(edge[1])
                     
@@ -198,16 +198,16 @@ class Decimater(obja.Model):
         # Add remaining vertices
         for (idx,v) in enumerate(self.vertices):
             if idx not in self.deleted_vertices:
-                self.writter.operation_add_vertex(idx, v)
+                self.writer.operation_add_vertex(idx, v)
                 
         # add remaining faces
         for (idx,f) in enumerate(self.faces):
             if idx not in self.deleted_faces:
-                self.writter.operation_add_face(idx, f)
+                self.writer.operation_add_face(idx, f)
             
             
         # Write the obja file
-        self.writter.write_output()
+        self.writer.write_output()
         
         return None
 
@@ -219,7 +219,7 @@ def main():
     # Number of iterations
     nbrIteration = 1
     
-    filename = 'suzanne.obj'
+    filename = 'cube.obj'
     np.seterr(invalid = 'raise')
     
     model = Decimater(filename,nbrIteration)
