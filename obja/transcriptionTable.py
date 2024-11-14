@@ -33,18 +33,18 @@ class TranscriptionTable(object):
     def __repr__(self):
         return f"TranscriptionTable(name={self.name}, table={self.table})"
         
-    def addLink(self, model: int, obja: int):
+    def addLink(self, model: int, obja: int) -> None:
         if self.table[model] is not None:
             print("Warning, a link is already added")
         self.table[model] = obja
         
-    def getObjaInd(self, model: int):
+    def getObjaInd(self, model: int) -> int:
         if self.table[model] is None:
             raise ObjaNotFoundError(model)
         else:
             return self.table[model]
         
-    def getModelInd(self, obja: int):
+    def getModelInd(self, obja: int) -> int:
         matching_indices = [index for index, value in enumerate(self.table) if value == obja]
         if len(matching_indices) == 0:
             raise ModelNotFoundError(obja, "No model index corresponds to the provided object index")
@@ -53,7 +53,7 @@ class TranscriptionTable(object):
         else:
             return matching_indices[0]
         
-    def isBijective(self):
+    def isBijective(self) -> None:
         # Check if there are any None values, which means the bijection is incomplete
         if None in self.table:
             raise TableNotBijectiveError(self.name, "Table contains None values and is incomplete")
@@ -64,10 +64,10 @@ class TranscriptionTable(object):
         
         print(f"The table '{self.name}' is bijective.")
         
-    def len(self):
+    def len(self) -> int:
         return len(self.table)
     
-    def getNumberOfUndefinedLink(self):
+    def getNumberOfUndefinedLink(self) -> int:
         # Return the number of None in the table
         return np.sum([1 for item in self.table if item is None])
 
