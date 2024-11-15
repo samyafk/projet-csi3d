@@ -122,6 +122,7 @@ def neighbours(vertex: int, edges: list) -> list:
         
     return neighbours
 
+# FIXME : A revoir
 def vertex_triangle(edge: list, edges: dict) -> tuple:
     """Checks that the two vertices of the edge only have 2 neighbours 
     in common and returns these neighbours
@@ -136,12 +137,13 @@ def vertex_triangle(edge: list, edges: dict) -> tuple:
     v1, v2 = edge[0], edge[1]
     v1_neighbours = neighbours(v1, edges)
     v2_neighbours = neighbours(v2, edges)
+    
             
     intersect = [v for v in v1_neighbours if v in v2_neighbours]
     
     if len(intersect) != 2:
         #TODO: Gerer l'execption
-        raise ValueError('Uh oh!')
+        raise ValueError("The edge doesn't have 2 neighbours in common")
     
     return intersect[0], intersect[1]
 
@@ -153,26 +155,26 @@ def check_quad(edge: list, edges: dict) -> None:
         edge (list): the edge
         edges (dict): the dictionnary with the edges
     """
-    #FIXME: optimiser les boucles de recherche de key/edge
     try:   
         w1, w2 = vertex_triangle(edge, edges)
-        
-        w1_neighbours = neighbours(w1, edges)
-        w2_neighbours = neighbours(w2, edges)
-        
-        if len(w1_neighbours) == 4:
-            for i, j in range(4):
-                key = edg2key(w1_neighbours[i], w1_neighbours[j])
-                if key in edges.keys():
-                    edges[key] = False
-        
-        if len(w2_neighbours) == 4:
-            for i, j in range(4):
-                key = edg2key(w2_neighbours[i], w2_neighbours[j])
-                if key in edges.keys():
-                    edges[key] = False
     except ValueError:
-        pass
+        return
+        
+    w1_neighbours = neighbours(w1, edges)
+    w2_neighbours = neighbours(w2, edges)
+    
+    if len(w1_neighbours) == 4:
+        for i, j in range(4):
+            key = edg2key(w1_neighbours[i], w1_neighbours[j])
+            if key in edges.keys():
+                edges[key] = False
+    
+    if len(w2_neighbours) == 4:
+        for i, j in range(4):
+            key = edg2key(w2_neighbours[i], w2_neighbours[j])
+            if key in edges.keys():
+                edges[key] = False
+    
 
 def check_third_condition(edges: dict) -> None:
     """Checks the third condition of the paper
