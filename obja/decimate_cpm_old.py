@@ -119,36 +119,6 @@ class Decimater(obja.Model):
             else:
                 output_model.edit_vertex(index, value)
 
-        
-        
-            
-        
-        # operations = []
-        # edges = create_dict_edges(self.faces)
-
-        # collapse = [True for ]
-        
-        # print(edges)
-        # print(collapse)
-        
-        # # Iterate through the vertex
-        # for (vertex_index, vertex) in enumerate(self.vertices):
-
-        #     # Iterate through the faces
-        #     for (face_index, face) in enumerate(self.faces):
-
-        #         # Delete any face related to this vertex
-        #         if face_index not in self.deleted_faces:
-        #             if vertex_index in [face.a,face.b,face.c]:
-        #                 self.deleted_faces.add(face_index)
-        #                 # Add the instruction to operations stack
-        #                 operations.append(('face', face_index, face))
-
-        #     # Delete the vertex
-        #     operations.append(('vertex', vertex_index, vertex))
-
-        
-
 def main():
     """
     Runs the program on the model given as parameter.
