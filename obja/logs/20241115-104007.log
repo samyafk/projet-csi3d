@@ -134,7 +134,25 @@ Add face : 10
 =============================================
 Add face : 11
 =============================================
+TranscriptionTable(name=Faces, table=[None None None None None None None None None None None 0])
+=============================================
+TranscriptionTable(name=Points, table=[None None None None None None None None])
+=============================================
 
 ==================[ERROR]====================
-this model index does not correspond to any object index: 0
+Traceback (most recent call last):
+  File "C:\Users\Thomas\Documents\SN\3A\projet-csi3d\obja\decimate_cpm.py", line 161, in compression_algorithm
+    self.writer.write_output()
+  File "C:\Users\Thomas\Documents\SN\3A\projet-csi3d\obja\writer.py", line 196, in write_output
+    self.__add_face_output(indexModel, value, color)
+  File "C:\Users\Thomas\Documents\SN\3A\projet-csi3d\obja\writer.py", line 142, in __add_face_output
+    pointFaceObja = self.__faceIndexModel_2_faceObjaModel(face)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Thomas\Documents\SN\3A\projet-csi3d\obja\writer.py", line 108, in __faceIndexModel_2_faceObjaModel
+    a = self.pointTable.getObjaInd(face.a)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Thomas\Documents\SN\3A\projet-csi3d\obja\transcriptionTable.py", line 56, in getObjaInd
+    raise ObjaNotFoundError(model_idx)
+transcriptionTable.ObjaNotFoundError: this model index does not correspond to any object index: 0
+
 =============================================
