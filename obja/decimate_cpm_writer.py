@@ -100,6 +100,8 @@ class Decimater(obja.Model):
                     # Update error metrics of edges involving vertex1 and vertex2
                     update_error_metrics(error_metrics, edge, edges, self.faces, self.vertices)
                     
+        self.writer.operation_change_color_faces([0,0,0.3])
+                    
         # Add remaining faces
         for (idx,f) in enumerate(self.faces):
             if idx not in self.deleted_faces:
