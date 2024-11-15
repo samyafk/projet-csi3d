@@ -213,7 +213,7 @@ def calculate_plane(p1, p2, p3):
 
 
 # Calculate the error metrics on every edge of the object
-def calculate_error_metrics(edges: dict, faces: list):
+def calculate_error_metrics(edges: dict, faces: list, vertices: list):
     
     # Initialise the error metrics
     error_metrics = dict()
@@ -223,13 +223,13 @@ def calculate_error_metrics(edges: dict, faces: list):
         
         # Get the coordinates of the actual vertices and the future vertex
         edge = key2edg(key)
-        v1 = np.array(edge[0])
-        v2 = np.array(edge[1])
+        v1 = np.array(vertices[edge[0]])
+        v2 = np.array(vertices[edge[1]])
         new_vertex = v1 + v2 / 2      
 
         # Get the faces comprising them
-        v1_faces = [face for face in faces if face.a == v1 or face.b == v1 or face.c == v1]
-        v2_faces = [face for face in faces if face.a == v2 or face.b == v2 or face.c == v2]
+        v1_faces = [face for face in faces if face.a == edge[0] or face.b == edge[0] or face.c == edge[0]]
+        v2_faces = [face for face in faces if face.a == edge[1] or face.b == edge[1] or face.c == edge[1]]
 
         # Compute the Q matrix for v1 and v2 :
         # Get the fundamental error quadrics of the planes comprising those faces and add them to Q
@@ -237,7 +237,7 @@ def calculate_error_metrics(edges: dict, faces: list):
         Q2 = np.zeros((4, 4))
 
         for face in v1_faces:
-            p1, p2, p3 = face.a, face.b, face.c
+            p1, p2, p3 = vertices[face.a], vertices[face.b], vertices[face.c]
             a, b, c, d = calculate_plane(np.array(p1), np.array(p2), np.array(p3))
             K = np.array([[a**2, a*b, a*c, a*d],
                  [a*b, b**2, b*c, b*d],
@@ -247,7 +247,7 @@ def calculate_error_metrics(edges: dict, faces: list):
             
 
         for face in v2_faces:
-            p1, p2, p3 = face.a, face.b, face.c
+            p1, p2, p3 = vertices[face.a], vertices[face.b], vertices[face.c]
             a, b, c, d = calculate_plane(np.array(p1), np.array(p2), np.array(p3))
             K = np.array([[a**2, a*b, a*c, a*d],
                  [a*b, b**2, b*c, b*d],
