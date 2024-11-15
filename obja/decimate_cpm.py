@@ -89,27 +89,29 @@ class Decimater(obja.Model):
 
             # Collapse the edge
             for (face_index,present) in enumerate(self.faceEvolution[currentIteration]):
-                if present:
-                    face = self.faces[face_index]
+                if not present:
+                    pass
+                
+                face = self.faces[face_index]
+                
+                # Delete any face related to this edge
+                if v1 in [face.a,face.b,face.c] and v2 in [face.a,face.b,face.c]:
+                    # Add 0 to the index of face_index (the face is deleted for the next iteration)
+                    self.faceEvolution[currentIteration+1][face_index] = 0
                     
-                    # Delete any face related to this edge
-                    if v1 in [face.a,face.b,face.c] and v2 in [face.a,face.b,face.c]:
-                        # Add 0 to the index of face_index (the face is deleted for the next iteration)
-                        self.faceEvolution[currentIteration+1][face_index] = 0
-                        
-                        self.writer.operation_add_face(face_index,face)
-                        
-                    elif v2 in [face.a,face.b,face.c]:
-                        # Translate the face
-                        self.writer.operation_edit_face(face_index,obja.Face(face.a, face.b, face.c))
-                        
-                        # Check which vertex is the v2 and translate it
-                        if v2 == face.a:
-                            face.a = v1
-                        elif v2 == face.b:
-                            face.b = v1
-                        elif v2 == face.c:
-                            face.c = v1
+                    self.writer.operation_add_face(face_index,face)
+                    
+                elif v2 in [face.a,face.b,face.c]:
+                    # Translate the face
+                    self.writer.operation_edit_face(face_index,obja.Face(face.a, face.b, face.c))
+                    
+                    # Check which vertex is the v2 and translate it
+                    if v2 == face.a:
+                        face.a = v1
+                    elif v2 == face.b:
+                        face.b = v1
+                    elif v2 == face.c:
+                        face.c = v1
             
             # Translate vertex1
             self.vertices[v1] = self.vertices[v1] + translation
@@ -147,15 +149,15 @@ class Decimater(obja.Model):
             self.logger.msg_log("Number of faces :" + str(sum(self.faceEvolution[i])))
             self.reduce_face(i)
             
-        # Add remaining vertices
-        for (idx,v) in enumerate(self.vertices):
-            if idx not in self.deleted_vertices:
-                self.writer.operation_add_vertex(idx, v)
-                                
         # add remaining faces
         for idx, (isPresent,face) in enumerate(zip(self.faceEvolution[-1],self.faces)):
             if isPresent:
                 self.writer.operation_add_face(idx, face)
+            
+        # Add remaining vertices
+        for (idx,v) in enumerate(self.vertices):
+            if idx not in self.deleted_vertices:
+                self.writer.operation_add_vertex(idx, v)
         
         try:
             self.writer.write_output()
@@ -163,6 +165,7 @@ class Decimater(obja.Model):
         except Exception as e:  # Catch and handle exceptions properly
             self.logger.msg_log(self.writer.faceTable)
             self.logger.msg_log(self.writer.pointTable)
+            self.logger.msg_log(self.writer.operations)
             self.logger.err_log(e)
             
             raise e
