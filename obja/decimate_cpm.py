@@ -148,6 +148,12 @@ class Decimater(obja.Model):
             print("Number of faces :" + str(sum(self.faceEvolution[i])) + "\n")
             self.logger.msg_log("Number of faces :" + str(sum(self.faceEvolution[i])))
             self.reduce_face(i)
+                                
+        # add remaining faces
+        for idx, (isPresent,face) in enumerate(zip(self.faceEvolution[-1],self.faces)):
+            if isPresent:
+                self.writer.operation_add_face(idx, face)
+                
             
         # add remaining faces
         for idx, (isPresent,face) in enumerate(zip(self.faceEvolution[-1],self.faces)):
