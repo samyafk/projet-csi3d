@@ -159,11 +159,11 @@ class Decimater(obja.Model):
         
         try:
             self.writer.write_output()
-        except Exception as e:  # Catch and handle exceptions properly
-            print(self.writer.faceTable)
-            print(self.writer.pointTable)
-            self.logger.err_log(e)
             self.logger.save_log()
+        except Exception as e:  # Catch and handle exceptions properly
+            self.logger.msg_log(self.writer.faceTable)
+            self.logger.msg_log(self.writer.pointTable)
+            self.logger.err_log(e)
             
             raise e
 
