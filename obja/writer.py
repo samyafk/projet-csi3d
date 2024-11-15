@@ -49,12 +49,6 @@ class Writer(object):
             indexModel (int): the index of the model
             value (list): the value of the vertex
         """
-        # self.pointTable.addLink(indexModel,self.pointCounter)
-        
-        # self.incrementPointCounter()
-        
-        # indexObja = self.pointTable.getObjaInd(indexModel)
-        
         self.operations.append(('v',indexModel, value))
     
     def operation_add_face(self,indexModel:int,value:obja.Face) -> None:
@@ -64,12 +58,6 @@ class Writer(object):
             indexModel (int): the index of the model
             value (Face): the value of the face
         """
-        # self.faceTable.addLink(indexModel,self.faceCounter)
-        
-        # self.incrementFaceCounter()
-        
-        # indexObja = self.faceTable.getObjaInd(indexModel)
-        
         self.operations.append(('f',indexModel, value))
         
     def operation_edit_vertex(self,indexModel:int,newValue:list) -> None:
@@ -78,9 +66,7 @@ class Writer(object):
         Args:
             indexModel (int): the index of the model
             newValue (list): the new value of the vertex
-        """
-        # indexObja = self.pointTable.getObjaInd(indexModel)
-                
+        """    
         self.operations.append(('ev',indexModel,newValue))
     
     def operation_edit_face(self, indexModel:int,newValue:obja.Face) -> None:
@@ -89,9 +75,7 @@ class Writer(object):
         Args:
             indexModel (int): the index of the model
             newValue (Face): the new value of the face
-        """        
-        # indexObja = self.faceTable.getObjaInd(indexModel)
-        
+        """         
         self.operations.append(('ef',indexModel,newValue))
         
     def operation_change_color_faces(self,color:list) -> None:
@@ -216,7 +200,7 @@ def main():
         
     print('test')
         
-    model = parse_file('example/cube.obj')
+    model = parse_file('example/suzanne.obj')
         
     writer = Writer('example/prout.obj',len(model.vertices),len(model.faces))
          
