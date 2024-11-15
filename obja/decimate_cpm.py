@@ -2,271 +2,175 @@
 
 import obja
 import numpy as np
-import sys
 from utils import *
-from obja import Face
+from transcriptionTable import *
+from obja import *
+from writer import *
+from tqdm import tqdm
+from log import Logger
+
+# TODO: ajouter le cas de la pondération à plus de 2 points
 
 class Decimater(obja.Model):
-    """
-    A simple class that decimates a 3D model stupidly.
-    """
-    def __init__(self):
+    """A simple class that decimates a 3D model not so stupidly."""
+    
+    def __init__(self,filename:str,nbrIteration:int):
         super().__init__()
-        self.deleted_faces = set()
+        
+        self.parse_file('example/'+filename)
+        
+        self.nbrIteration = nbrIteration
+        
+        # List of list that have the evolution of the remaining faces through the iterations
+        # 0 will indiq that the face is not here in this iteration
+        # 1 will indiq that the face is again here
+        self.faceEvolution = []
+        
+        # At the creation, all the face are here
+        self.faceEvolution.append(np.ones(len(self.faces)))
+        
+        self.writer = Writer(filename,len(self.vertices),len(self.faces))
+
         self.deleted_vertices = set()
         
-    def iterate_faces(self, output):
+        self.logger = Logger()
         
-        # Create the operations list
-        operations = []
+    def retrieveFaces(self,currentIteration:int) -> list:
+        """Retrieve the remaining faces for the current iteration
+
+        Args:
+            currentIteration (int): the iteration you want
+
+        Returns:
+            array: array of the remaining faces according to the iteration number
+        """
+        return [array for array, binary in zip(self.faces, self.faceEvolution[currentIteration]) if binary == 1]
         
-        # The difference between self.faces and self.deleted_faces
-        remaining_faces = set([face for (idx, face) in enumerate(self.faces) if idx not in self.deleted_faces])
+         
+    def reduce_face(self,currentIteration:int) -> None:
+        """Going through one iteration of the squeeze method
         
-        # Create the dict with the edges
-        edges = create_dict_edges(remaining_faces)
+        Args:
+            currentIteration (int): the current iteration number
+        """
+        faces = self.retrieveFaces(currentIteration)
         
-        # Check second condition
-        edges = check_second_condition(edges)
+        # Create the list for the next iteration
+        self.faceEvolution.append(self.faceEvolution[currentIteration])
         
-        # Check third condtition
-        check_third_condition(edges)
+        edges = self.conditions(faces)
         
-        # Create list of collapsed vertices
         collapsed_vertices = []
         
-        # For each edges in the dict
         for key in edges:
-            
             collapsible = edges[key]
-            # If second and third condition ok
-            if collapsible:
-                
-                # Get the vertices of the edge
-                edge = key2edg(key)
-                
-                # Check if one of the two already collapsed
-                if edge[0] in collapsed_vertices or edge[1] in collapsed_vertices:
-                    edges[key] = False
-                    pass
-                else:
-                    
-                    # Add the two vertex into the list : collapsed_vertices
-                    collapsed_vertices.append(edge[0])
-                    collapsed_vertices.append(edge[1])
-                    
-                    
-                    # Get the coord of the first vertex
-                    coordVert1 = self.vertices[edge[0]]
-                    
-                    # Get the coord of the second vertex
-                    coordVert2 = self.vertices[edge[1]]
-                    
-                    # Compute the translation vector
-                    t = (coordVert2 - coordVert1)/2
-                    
-                    # Collapse the edge
-                    for (face_index, face) in enumerate(self.faces):
-                        # Delete any face related to this edge
-                        if face_index not in self.deleted_faces:
-                            if edge[0] in [face.a,face.b,face.c] and edge[1] in [face.a,face.b,face.c]:
-                                self.deleted_faces.add(face_index)
-                                # Add the instruction to operations stack
-                                operations.append(('f', face_index, face))
-                            elif edge[1] in [face.a,face.b,face.c]:
-                                operations.append(('ef', face_index, Face(face.a, face.b, face.c)))
-                                if edge[1] == face.a:
-                                    face.a = edge[0]
-                                elif edge[1] == face.b:
-                                    face.b = edge[0]
-                                elif edge[1] == face.c:
-                                    face.c = edge[0]
-                    
-                    # Translate vertex1
-                    self.vertices[edge[0]] = coordVert1 + t
-                    operations.append(('tv', edge[0], -t))
-                    
-                    # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
-                    operations.append(('v', edge[1], coordVert2))
-                    self.deleted_vertices.add(edge[1])
-                    
-
-                    
-        # To rebuild the model, run operations in reverse order
-        operations.reverse()
-
-        # Write the result in output file
-        output_model = obja.Output(output, random_color=True)
-        
-        # Add remaining vertices
-        for (idx,v) in enumerate(self.vertices):
-            if idx not in self.deleted_vertices:
-                output_model.add_vertex(idx, v)
-                
-        # add remaining faces
-        for (idx,f) in enumerate(self.faces):
-            if idx not in self.deleted_faces:
-                output_model.add_face(idx, f)
-
-        
-        for (ty, index, value) in operations:
             
-            if ty == "v":
-                output_model.add_vertex(index, value)
-            elif ty == "f":
-                output_model.add_face(index, value)  
-            elif ty == "tv":
-                output_model.edit_vertex(index, self.vertices[index] + value)
-            elif ty == "ef":
-                output_model.edit_face(index, value)        
-            else:
-                output_model.edit_vertex(index, value)
+            if not collapsible:
+                pass
                 
-    def iterate_faces_new(self,remaining_faces):
-        
-        # Create the current operations list
-        currentOperations = []
-        
-        # Create the dict with the edges
-        edges = create_dict_edges(remaining_faces)
-        
-        # Check second condition
-        edges = check_second_condition(edges)
-        
-        # Check third condtition
-        check_third_condition(edges)
-        
-        # Create list of collapsed vertices
-        collapsed_vertices = []
-        
-        # For each edges in the dict
-        for key in edges:
+            edge = key2edg(key)
             
-            collapsible = edges[key]
-            # If second and third condition ok
-            if collapsible:
+            v1 = edge[0]
+            v2 = edge[1]
+            
+            if v1 in collapsed_vertices or v2 in collapsed_vertices:
+                edges[key] = False
+                pass
                 
-                # Get the vertices of the edge
-                edge = key2edg(key)
-                
-                # Check if one of the two already collapsed
-                if edge[0] in collapsed_vertices or edge[1] in collapsed_vertices:
-                    edges[key] = False
-                    pass
-                else:
-                    
-                    # Add the two vertex into the list : collapsed_vertices
-                    collapsed_vertices.append(edge[0])
-                    collapsed_vertices.append(edge[1])
-                    
-                    
-                    # Get the coord of the first vertex
-                    coordVert1 = self.vertices[edge[0]]
-                    
-                    # Get the coord of the second vertex
-                    coordVert2 = self.vertices[edge[1]]
-                    
-                    # Compute the translation vector
-                    t = (coordVert2 - coordVert1)/2
-                    
-                    # Collapse the edge
-                    for (face_index, face) in enumerate(self.faces):
+            collapsed_vertices.append(v1)
+            collapsed_vertices.append(v2)
+            
+            coordVert1 = self.vertices[v1]
+            coordVert2 = self.vertices[v2]
                         
-                        # Check if the face in the remaining_faces
-                        if face in remaining_faces:
-                            
-                            # Delete any face related to this edge
-                            if edge[0] in [face.a,face.b,face.c] and edge[1] in [face.a,face.b,face.c]:
-                                
-                                # Add the face to the deleted_faces
-                                self.deleted_faces.add(face_index)
-                                
-                                # Add the instruction to operations stack
-                                currentOperations.append(('f', face_index, face))
-                                
-                            # Check if the edge[1] is in the face
-                            elif edge[1] in [face.a,face.b,face.c]:
-                                
-                                # Translate the face
-                                currentOperations.append(('ef', face_index, Face(face.a, face.b, face.c)))
-                                
-                                # Check which vertex is the edge[1] and translate it
-                                if edge[1] == face.a:
-                                    self.faces[face_index].a = edge[0]
-                                    face.a = edge[0]
-                                elif edge[1] == face.b:
-                                    face.b = edge[0]
-                                elif edge[1] == face.c:
-                                    face.c = edge[0]
-                    
-                    # Translate vertex1
-                    self.vertices[edge[0]] = coordVert1 + t
-                    currentOperations.append(('tv', edge[0], -t))
-                    
-                    # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
-                    currentOperations.append(('v', edge[1], coordVert2))
-                    self.deleted_vertices.add(edge[1])
-                    
-        return currentOperations
+            translation = (coordVert1 - coordVert2)/2
 
-    def contract(self, output):
-        
-        operations = []
-        
-        i=0
-        while i < 5:
-
-            # The difference between self.faces and self.deleted_faces
-            remaining_faces = set([face for (idx, face) in enumerate(self.faces) if idx not in self.deleted_faces])
+            # Collapse the edge
+            for (face_index,present) in enumerate(self.faceEvolution[currentIteration]):
+                if present:
+                    face = self.faces[face_index]
+                    
+                    # Delete any face related to this edge
+                    if v1 in [face.a,face.b,face.c] and v2 in [face.a,face.b,face.c]:
+                        # Add 0 to the index of face_index (the face is deleted for the next iteration)
+                        self.faceEvolution[currentIteration+1][face_index] = 0
+                        
+                        self.logger.msg_log("Add face : " + str(face_index) + "\n")
+                        self.writer.operation_add_face(face_index,face)
+                        
+                    elif v2 in [face.a,face.b,face.c]:
+                        # Translate the face
+                        self.logger.msg_log("Edit face : " + str(face_index) + "\n")
+                        self.writer.operation_edit_face(face_index,obja.Face(face.a, face.b, face.c))
+                        
+                        # Check which vertex is the v2 and translate it
+                        if v2 == face.a:
+                            face.a = v1
+                        elif v2 == face.b:
+                            face.b = v1
+                        elif v2 == face.c:
+                            face.c = v1
             
-            currentOperations = Decimater.iterate_faces_new(self,remaining_faces)
-            i+=1
+            # Translate vertex1
+            self.vertices[v1] = self.vertices[v1] + translation
+            self.logger.msg_log("Edit vertex : " + str(v1) + "\n")
+            self.writer.operation_edit_vertex(v1,self.vertices[v1] -translation)
             
-            operations = operations + currentOperations
+            # Delete vertex2 (no need to delete it from self.vertices 
+            # bc we create edges using faces and it wont appear in the faces anymore)
+            self.writer.operation_add_vertex(v2,self.vertices[v2])
+            self.logger.msg_log("Delete vertex : " + str(v2) + "\n")
+            self.deleted_vertices.add(v2)        
+    
+    def conditions(self,faces:list) -> dict:
+        """Create the dictionnary of the edges and checks the conditions
         
-        # To rebuild the model, run operations in reverse order
-        operations.reverse()
-
-        # Write the result in output file
-        output_model = obja.Output(output, random_color=True)
+        Args:
+            faces (list): list of the faces
+            
+        Returns:
+            dict: dictionnary of the edges
+        """
+        edges = create_dict_edges(faces)
+        edges = check_second_condition(edges)
+        check_third_condition(edges)
         
+        return edges
+            
+    def error(self):
+        return None   
+    
+    def compression_algorithm(self) -> None:
+        """Main function that will run CPM SQUEEZE algorithm
+    
+        """
+        for i in range(self.nbrIteration):
+            print("Number of faces :" + str(sum(self.faceEvolution[i])) + "\n")
+            self.logger.msg_log("Number of faces :" + str(sum(self.faceEvolution[i])) + "\n")
+            self.reduce_face(i)
+            
         # Add remaining vertices
         for (idx,v) in enumerate(self.vertices):
             if idx not in self.deleted_vertices:
-                output_model.add_vertex(idx, v)
-                
+                self.writer.operation_add_vertex(idx, v)
+                                
         # add remaining faces
-        for (idx,f) in enumerate(self.faces):
-            if idx not in self.deleted_faces:
-                output_model.add_face(idx, f)
-
+        for idx, (isPresent,face) in enumerate(zip(self.faceEvolution[-1],self.faces)):
+            if isPresent:
+                self.writer.operation_add_face(idx, face)
         
-        for (ty, index, value) in operations:
-            
-            if ty == "v":
-                output_model.add_vertex(index, value)
-            elif ty == "f":
-                output_model.add_face(index, value)  
-            elif ty == "tv":
-                output_model.edit_vertex(index, self.vertices[index] + value)
-            elif ty == "ef":
-                output_model.edit_face(index, value)        
-            else:
-                output_model.edit_vertex(index, value)
-        
-
-        
+        self.writer.write_output()
+        self.logger.save_log()
 
 def main():
-    """
-    Runs the program on the model given as parameter.
-    """
+    nbrIteration = 1
+    
     filename = 'suzanne.obj'
     np.seterr(invalid = 'raise')
-    model = Decimater()
-    model.parse_file('example/'+filename)
-    with open('example/'+filename+'a', 'w') as output:
-        model.contract(output)
+    
+    model = Decimater(filename,nbrIteration)
+    
+    model.compression_algorithm()
 
 
 if __name__ == '__main__':
