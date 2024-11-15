@@ -20,9 +20,13 @@ class TableNotBijectiveError(Exception):
 
 class TranscriptionTable(object):
     
-    def __init__(self, name: str, nbrOfObject: int):
+    def __init__(self, name: str, nbrOfObject: int,default:str=None):
         self.name = name
-        self.table = np.full(nbrOfObject, fill_value=None)
+        
+        if default == "Identity":
+            self.table = np.array([i for i in range(nbrOfObject)])
+        else:
+            self.table = np.full(nbrOfObject, fill_value=None)
         
     def __repr__(self) -> str:
         return f"TranscriptionTable(name={self.name}, table={self.table})"
@@ -122,6 +126,8 @@ def main():
         table.isBijective()  # Expected: TableNotBijectiveError
     except TableNotBijectiveError as e:
         print(e)
+        
+    print(TranscriptionTable("Identité", 5,"Identity"))
 
 if __name__ == '__main__':
     main()
