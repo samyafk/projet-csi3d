@@ -182,7 +182,8 @@ class Writer(object):
         print("Start writing the output file \n")
         
         # Now defind a color for the faces
-        color = [random.uniform(0, 1),random.uniform(0, 1),random.uniform(0, 1)]
+        gray_value = random.uniform(0, 1)  # Generate a single random value for gray
+        color = [gray_value, gray_value, gray_value]
         
         reverseOperations = self.operations[::-1]
         
