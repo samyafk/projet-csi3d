@@ -169,7 +169,7 @@ class Writer(object):
         """
         indexObja = self.faceTable.getObjaInd(indexModel)
         
-        pointFaceObja = self.__faceIndexModel_2_faceObjaModel(self,face)
+        pointFaceObja = self.__faceIndexModel_2_faceObjaModel(face)
         
         print('ef {} {} {} {}'.format(indexObja+1,pointFaceObja[0], pointFaceObja[1], pointFaceObja[2]), file=self.outputFile)
         
