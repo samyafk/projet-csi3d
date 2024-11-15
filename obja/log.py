@@ -1,7 +1,7 @@
 import time
 
-ERROR_START = "==================[ERROR]====================\n"
-SEPARATOR   = "=============================================\n"
+ERROR_START = "\n==================[ERROR]====================\n"
+SEPARATOR   = "\n=============================================\n"
 
 class Logger():
     """Class that will log the error and the message of the program"""
@@ -25,7 +25,7 @@ class Logger():
         Args:
             err (str): the error to log
         """
-        err_log = ERROR_START + err + SEPARATOR
+        err_log = ERROR_START + str(err) + SEPARATOR
         self.logs.append(err_log)
         self.save_log()
         
@@ -34,7 +34,7 @@ class Logger():
     def save_log(self) -> None:
         """Save the log in a file
         """
-        path = "logs/" + self.filemane
+        path = "logs/" + self.filename
         
         with open(path, "w") as file:
             for log in self.logs:

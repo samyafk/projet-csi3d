@@ -29,11 +29,13 @@ class Decimater(obja.Model):
         # At the creation, all the face are here
         self.faceEvolution.append(np.ones(len(self.faces)))
         
-        self.writer = Writer(filename,len(self.vertices),len(self.faces))
-
-        self.deleted_vertices = set()
         
         self.logger = Logger()
+        
+        self.writer = Writer(filename,len(self.vertices),len(self.faces),self.logger)
+
+        self.deleted_vertices = set()
+    
         
     def retrieveFaces(self,currentIteration:int) -> list:
         """Retrieve the remaining faces for the current iteration
@@ -95,12 +97,10 @@ class Decimater(obja.Model):
                         # Add 0 to the index of face_index (the face is deleted for the next iteration)
                         self.faceEvolution[currentIteration+1][face_index] = 0
                         
-                        self.logger.msg_log("Add face : " + str(face_index) + "\n")
                         self.writer.operation_add_face(face_index,face)
                         
                     elif v2 in [face.a,face.b,face.c]:
                         # Translate the face
-                        self.logger.msg_log("Edit face : " + str(face_index) + "\n")
                         self.writer.operation_edit_face(face_index,obja.Face(face.a, face.b, face.c))
                         
                         # Check which vertex is the v2 and translate it
@@ -113,13 +113,11 @@ class Decimater(obja.Model):
             
             # Translate vertex1
             self.vertices[v1] = self.vertices[v1] + translation
-            self.logger.msg_log("Edit vertex : " + str(v1) + "\n")
             self.writer.operation_edit_vertex(v1,self.vertices[v1] -translation)
             
             # Delete vertex2 (no need to delete it from self.vertices 
             # bc we create edges using faces and it wont appear in the faces anymore)
             self.writer.operation_add_vertex(v2,self.vertices[v2])
-            self.logger.msg_log("Delete vertex : " + str(v2) + "\n")
             self.deleted_vertices.add(v2)        
     
     def conditions(self,faces:list) -> dict:
@@ -146,7 +144,7 @@ class Decimater(obja.Model):
         """
         for i in range(self.nbrIteration):
             print("Number of faces :" + str(sum(self.faceEvolution[i])) + "\n")
-            self.logger.msg_log("Number of faces :" + str(sum(self.faceEvolution[i])) + "\n")
+            self.logger.msg_log("Number of faces :" + str(sum(self.faceEvolution[i])))
             self.reduce_face(i)
             
         # Add remaining vertices
@@ -159,13 +157,20 @@ class Decimater(obja.Model):
             if isPresent:
                 self.writer.operation_add_face(idx, face)
         
-        self.writer.write_output()
-        self.logger.save_log()
+        try:
+            self.writer.write_output()
+        except Exception as e:  # Catch and handle exceptions properly
+            print(self.writer.faceTable)
+            print(self.writer.pointTable)
+            self.logger.err_log(e)
+            self.logger.save_log()
+            
+            raise e
 
 def main():
     nbrIteration = 1
     
-    filename = 'suzanne.obj'
+    filename = 'cube.obj'
     np.seterr(invalid = 'raise')
     
     model = Decimater(filename,nbrIteration)
