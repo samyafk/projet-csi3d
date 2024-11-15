@@ -93,6 +93,9 @@ class Decimater(obja.Model):
                     operations.append(('v', edge[1], coordVert2))
                     self.deleted_vertices.add(edge[1])
                     
+                    # Update error metrics of edges involving vertex1 and vertex2
+                    update_error_metrics(error_metrics, edge, edges, self.faces, self.vertices)
+                    
 
                     
         # To rebuild the model, run operations in reverse order
