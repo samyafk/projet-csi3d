@@ -23,6 +23,12 @@ class Decimater(obja.Model):
         # Create the dict with the edges
         edges = create_dict_edges(self.faces)
         
+        # Calculate the error metrics
+        error_metrics = calculate_error_metrics(edges, self.faces, self.vertices)
+        
+        # Reorder edges based on their error metrics
+        sorted_edges = dict(sorted(error_metrics.items(), key=lambda item: item[1]))
+        
         # Check second condition
         edges = check_second_condition(edges)
         
@@ -33,7 +39,7 @@ class Decimater(obja.Model):
         collapsed_vertices = []
         
         # For each edges in the dict
-        for key in edges:
+        for key in sorted_edges:
             
             collapsible = edges[key]
             # If second and third condition ok
