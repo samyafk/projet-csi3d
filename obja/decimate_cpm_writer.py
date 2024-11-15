@@ -20,7 +20,7 @@ class Decimater(obja.Model):
         self.deleted_faces = set()
         self.deleted_vertices = set()
         self.logger = Logger()
-        self.writer = Writer(filename, len(self.vertices), len(self.faces), self.logger)
+        self.writer = Writer('example/'+filename, len(self.vertices), len(self.faces), self.logger)
 
     def contract(self):
         
