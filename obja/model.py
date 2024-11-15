@@ -1,5 +1,7 @@
 from obja import *
 from transcriptionTable import *
+import numpy as np
+
 
 class ModelIteration(object):
     
@@ -30,20 +32,28 @@ class ModelIteration(object):
             return self.__verticesTable
         else:
             raise KeyError
-
+        
+    def setTranscriptionTable(self,objectType:str,table:np.array):
+        if objectType == 'face':
+            self.__facesTable = table
+        elif objectType == 'vertice':
+            self.__verticesTable = table
+        else:
+            raise KeyError
+        
 class Model3D(object):
     
     def __init__(self,filename:str):
         
         # Create the main list
-        self.__model = []
+        self.__modelList = []
         
         # Get the initial model from the .obj file
         initModel = Model()
         initModel.parse_file('example/'+filename)
         
         # Create the ModelIteration object associated of the inital model
-        self.__model.append(ModelIteration(0,initModel.faces,initModel.vertices))
+        self.__modelList.append(ModelIteration(0,initModel.faces,initModel.vertices))
         
         # Get the number of faces and vertices
         self.numberOfFaces = len(initModel.faces)
@@ -59,46 +69,33 @@ class Model3D(object):
         model = ModelIteration(iteration,faces,vertices)
         
         # Now, we need to create the transcription table to save a link between the index of the initial model
-        faceTable = TranscriptionTable('Faces',len(faces))
-        verticesTable = TranscriptionTable('vertices',len(vertices))
+        faceTable,verticeTable = self.createTranscriptionTable(model,facesEvolution,verticesEvolution)
         
-        # Now lets fill them
-        currentIteration = iteration
+        # Now set theses tables into the current model
+        model.setTranscriptionTable('face',faceTable)
+        model.setTranscriptionTable('vertice',verticeTable)
         
-        while currentIteration != 0:
-            
-            counter = 0
-            
-            for i in range(len(facesEvolution)):
-                
-                # Get the current evolution (ie : the face is still present or not in this new model)
-                value = facesEvolution[i]
-                
-                if value == 1:
-                    faceTable.addLink()
-                    
-        
-        return None
+        # Finally, add this model into the modelList
+        self.__modelList.append(model)
+
     
-    def createTranscriptionTable(self,iteration:int,numberOfElement:int,evolution:list,objectType:str='face'):
+    def createTranscriptionTable(self,model:ModelIteration,facesEvolution:list,verticesEvolution:list):
         
         # iteration must be > 0
-        if iteration > 0:
+        if model.iteration > 0:
             raise NameError
         
-        # First create the transcription table and get the one from the last iteration
-        if objectType == 'face':
-            currentTable = TranscriptionTable("Iter " + str(iteration) + " facesTable",numberOfElement,"Identity")
-            previousTable = self.__model[iteration-1].getTranscriptionTable('face')
-        elif objectType == 'vertices':
-            currentTable = TranscriptionTable("Iter " + str(iteration) + " verticesTable",numberOfElement,"Identity")
-            previousTable = self.__model[iteration-1].getTranscriptionTable('vertice')
-            
-        counter = 0 
-            
-        # Now fill in the transcription table
-        for i in range(evolution):
-            
+        # We need to have the transcription table of the iteration 0, but it's only an identity, so let's recreate it
+        faceTable = np.array([i for i in range(self.numberOfFaces)])
+        verticeTable = np.array([i for i in range(self.numberOfVertices)])
+        
+        # The algorithm is simple : 
+        #   When evolution[i] = 1 -> We do nothing
+        #   When evolution[i] = 0 -> We remove the value with the index i of the list
+        faceTable = [valeur for i, valeur in enumerate(faceTable) if facesEvolution[i] == 1]
+        verticeTable = [valeur for i, valeur in enumerate(verticeTable) if verticesEvolution[i] == 1]
+        
+        return faceTable,verticeTable
         
         
 """
