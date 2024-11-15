@@ -57,20 +57,20 @@ def create_dict_edges(faces: Face) -> dict:
     return edges_dic
 
 def check_second_condition(edges: dict) -> dict:
-    """Check the second condition of the paper
+    """For each edge e = (v1, v2 ) that will be collapsed and any vertex w that is connected by an
+    edge to both v1 and v2 , the triple (v1 , v2, w) must define a valid triangle in Mi+1 .
     
     Args:
-        edges (dict): a dictionnary with the edges
+        edges (dict): the dictionnary with the edges
         
     Returns:
-        dict: the dictionnary with the edges
+        dict: the dictionnary with the edges that are collapsable
     """
     for key in edges:
         edge = key2edg(key)
         edges[key] = check_neighbour(edge,edges)
         
     return edges
-
 
 def check_neighbour(edge: list, edges: dict) -> bool:
     """Checks that the two vertices of the edge only have two neighbours in common
@@ -81,11 +81,7 @@ def check_neighbour(edge: list, edges: dict) -> bool:
         
     Returns:
         bool: True if the edge is collapsable, False otherwise
-    """
-    
-    #FIXME: fonction obselete (cf. neighbours)
-    warn("fonction obselete (cf. neighbours) pour la mettre à jour", DeprecationWarning, stacklevel=2)
-    
+    """    
     v1, v2 = edge[0], edge[1]
     v1_neighbours, v2_neighbours = [], []
     
@@ -126,8 +122,7 @@ def neighbours(vertex: int, edges: list) -> list:
         
     return neighbours
 
-# 
-def vertex_tri(edge: list, edges: dict) -> tuple:
+def vertex_triangle(edge: list, edges: dict) -> tuple:
     """Checks that the two vertices of the edge only have 2 neighbours 
     in common and returns these neighbours
     
@@ -160,7 +155,7 @@ def check_quad(edge: list, edges: dict) -> None:
     """
     #FIXME: optimiser les boucles de recherche de key/edge
     try:   
-        w1, w2 = vertex_tri(edge, edges)
+        w1, w2 = vertex_triangle(edge, edges)
         
         w1_neighbours = neighbours(w1, edges)
         w2_neighbours = neighbours(w2, edges)

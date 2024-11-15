@@ -1,2 +1,5 @@
 assets
 __pycache__
+*.obja
+obja\example\*.obja
+logs
