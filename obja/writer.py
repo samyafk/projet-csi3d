@@ -142,7 +142,7 @@ class Writer(object):
         pointFaceObja = self.__faceIndexModel_2_faceObjaModel(face)
 
         # Add the face into the output file        
-        print('f {} {} {}'.format(pointFaceObja[0], pointFaceObja[1], pointFaceObja[2]), file=self.outputFile)
+        print('f {} {} {}'.format(pointFaceObja[0] + 1, pointFaceObja[1] + 1, pointFaceObja[2] + 1), file=self.outputFile)
         
         # Add color to the face
         if color != None:
@@ -171,7 +171,7 @@ class Writer(object):
         
         pointFaceObja = self.__faceIndexModel_2_faceObjaModel(face)
         
-        print('ef {} {} {} {}'.format(indexObja+1,pointFaceObja[0], pointFaceObja[1], pointFaceObja[2]), file=self.outputFile)
+        print('ef {} {} {} {}'.format(indexObja+1,pointFaceObja[0] + 1, pointFaceObja[1] + 1, pointFaceObja[2] + 1), file=self.outputFile)
         
         if color != None:
             print('fc {} {} {} {}'.format(indexObja+1,color[0],color[1],color[2]),file=self.outputFile)
@@ -182,7 +182,7 @@ class Writer(object):
         print("Start writing the output file \n")
         
         # Now defind a color for the faces
-        gray_value = random.uniform(0, 1)  # Generate a single random value for gray
+        gray_value = 0.5  
         color = [gray_value, gray_value, gray_value]
         
         reverseOperations = self.operations[::-1]
@@ -215,7 +215,7 @@ def main():
         
     print('test')
         
-    model = parse_file('example/suzanne.obj')
+    model = parse_file('example/cube.obj')
         
     writer = Writer('example/prout.obj',len(model.vertices),len(model.faces))
          
