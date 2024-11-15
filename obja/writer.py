@@ -1,6 +1,7 @@
 from transcriptionTable import *
 import obja
 from obja import *
+from log import *
 import random
 from tqdm import tqdm
 
@@ -17,11 +18,12 @@ class IndexFaceExceedError(Exception):
 
 class Writer(object):
     
-    def __init__(self,outputFile:str,nbrPoints:int,nbrFaces:int):
+    def __init__(self,outputFile:str,nbrPoints:int,nbrFaces:int,logger:Logger=None):
         self.operations = []
         self.outputFile = outputFile
         self.faceTable = TranscriptionTable("Faces",nbrFaces)
         self.pointTable = TranscriptionTable("Points",nbrPoints)
+        self.logger = logger
         
         self.faceCounter = 0
         self.pointCounter = 0
@@ -50,6 +52,9 @@ class Writer(object):
             value (list): the value of the vertex
         """
         self.operations.append(('v',indexModel, value))
+        
+        if self.logger != None:
+            self.logger.msg_log('Add vertex : ' + str(indexModel))
     
     def operation_add_face(self,indexModel:int,value:obja.Face) -> None:
         """Add a face into the operation stack
@@ -60,6 +65,9 @@ class Writer(object):
         """
         self.operations.append(('f',indexModel, value))
         
+        if self.logger != None:
+            self.logger.msg_log('Add face : ' + str(indexModel))
+        
     def operation_edit_vertex(self,indexModel:int,newValue:list) -> None:
         """Edit a vertex into the operation stack
         
@@ -68,6 +76,9 @@ class Writer(object):
             newValue (list): the new value of the vertex
         """    
         self.operations.append(('ev',indexModel,newValue))
+        
+        if self.logger != None:
+            self.logger.msg_log('Edit vertex : ' + str(indexModel))
     
     def operation_edit_face(self, indexModel:int,newValue:obja.Face) -> None:
         """Edit a face into the operation stack
@@ -77,6 +88,9 @@ class Writer(object):
             newValue (Face): the new value of the face
         """         
         self.operations.append(('ef',indexModel,newValue))
+        
+        if self.logger != None:
+            self.logger.msg_log('Edit face : ' + str(indexModel))
         
     def operation_change_color_faces(self,color:list) -> None:
         """Change the color of the faces"""
