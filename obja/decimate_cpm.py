@@ -9,6 +9,8 @@ from writer import *
 from tqdm import tqdm
 from log import Logger
 
+# TODO: ajouter le cas de la pondération à plus de 2 points
+
 class Decimater(obja.Model):
     """A simple class that decimates a 3D model not so stupidly."""
     
@@ -75,7 +77,6 @@ class Decimater(obja.Model):
                 edges[key] = False
                 pass
                 
-            #FIXME ajouter le cas de la pondération à plus de 2 points
             collapsed_vertices.append(v1)
             collapsed_vertices.append(v2)
             
@@ -141,10 +142,11 @@ class Decimater(obja.Model):
     
     def compression_algorithm(self) -> None:
         """Main function that will run CPM SQUEEZE algorithm
-            
+    
         """
         for i in range(self.nbrIteration):
             print("Number of faces :" + str(sum(self.faceEvolution[i])) + "\n")
+            self.logger.msg_log("Number of faces :" + str(sum(self.faceEvolution[i])) + "\n")
             self.reduce_face(i)
             
         # Add remaining vertices
@@ -158,6 +160,7 @@ class Decimater(obja.Model):
                 self.writer.operation_add_face(idx, face)
         
         self.writer.write_output()
+        self.logger.save_log()
 
 def main():
     nbrIteration = 1

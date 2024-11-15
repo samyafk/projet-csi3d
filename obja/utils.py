@@ -12,7 +12,6 @@ def edg2key(p1:int, p2:int) -> str:
     Returns:
         str: the final key
     """
-    
     # We want the smallest number first
     if p1 < p2:
         return str(p1) + "," + str(p2)
@@ -29,7 +28,6 @@ def key2edg(key: str) -> list:
     Returns:
         tuple: a tuple of two integers (p1, p2)
     """
-    
     p1, p2 = map(int, key.split(","))
     
     return [p1, p2]
@@ -46,7 +44,6 @@ def create_dict_edges(faces: Face) -> dict:
     Returns:
         dict: A dict
     """
-    
     edges_dic = {}
     
     for face in faces:
@@ -68,7 +65,6 @@ def check_second_condition(edges: dict) -> dict:
     Returns:
         dict: the dictionnary with the edges
     """
-    
     for key in edges:
         edge = key2edg(key)
         edges[key] = check_neighbour(edge,edges)
@@ -87,7 +83,7 @@ def check_neighbour(edge: list, edges: dict) -> bool:
         bool: True if the edge is collapsable, False otherwise
     """
     
-    #FIXME fonction obselete (cf. neighbours)
+    #FIXME: fonction obselete (cf. neighbours)
     warn("fonction obselete (cf. neighbours) pour la mettre à jour", DeprecationWarning, stacklevel=2)
     
     v1, v2 = edge[0], edge[1]
@@ -121,7 +117,6 @@ def neighbours(vertex: int, edges: list) -> list:
     Returns:
         list: the list of neighbours
     """
-    
     neighbours = []
     for e in edges:
         if vertex == e[0]:
@@ -143,7 +138,6 @@ def vertex_tri(edge: list, edges: dict) -> tuple:
     Returns:
         tuple: the two neighbours
     """
-    
     v1, v2 = edge[0], edge[1]
     v1_neighbours = neighbours(v1, edges)
     v2_neighbours = neighbours(v2, edges)
@@ -151,7 +145,7 @@ def vertex_tri(edge: list, edges: dict) -> tuple:
     intersect = [v for v in v1_neighbours if v in v2_neighbours]
     
     if len(intersect) != 2:
-        #TODO Gerer l'execption
+        #TODO: Gerer l'execption
         raise ValueError('Uh oh!')
     
     return intersect[0], intersect[1]
@@ -164,7 +158,7 @@ def check_quad(edge: list, edges: dict) -> None:
         edge (list): the edge
         edges (dict): the dictionnary with the edges
     """
-    #FIXME optimiser les boucles de recherche de key/edge
+    #FIXME: optimiser les boucles de recherche de key/edge
     try:   
         w1, w2 = vertex_tri(edge, edges)
         
