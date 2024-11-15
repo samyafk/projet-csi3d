@@ -34,12 +34,12 @@ class TranscriptionTable(object):
             model_idx (int): the model index
             obja_idx (int): the obja index
         """
-        obja_link = self.table[model_idx]
         
-        if obja_link is not None:
+        
+        if self.table[model_idx] is not None:
             print("Warning, a link is already added")
             
-        obja_link = obja_idx
+        self.table[model_idx] = obja_idx
         
     def getObjaInd(self, model_idx: int) -> int:
         """Get the obja index corresponding to a model index.

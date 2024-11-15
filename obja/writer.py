@@ -49,11 +49,11 @@ class Writer(object):
             indexModel (int): the index of the model
             value (list): the value of the vertex
         """
-        self.pointTable.addLink(indexModel,self.pointCounter)
+        # self.pointTable.addLink(indexModel,self.pointCounter)
         
-        self.incrementPointCounter()
+        # self.incrementPointCounter()
         
-        indexObja = self.pointTable.getObjaInd(indexModel)
+        # indexObja = self.pointTable.getObjaInd(indexModel)
         
         self.operations.append(('v',indexModel, value))
     
@@ -64,11 +64,11 @@ class Writer(object):
             indexModel (int): the index of the model
             value (Face): the value of the face
         """
-        self.faceTable.addLink(indexModel,self.faceCounter)
+        # self.faceTable.addLink(indexModel,self.faceCounter)
         
-        self.incrementFaceCounter()
+        # self.incrementFaceCounter()
         
-        indexObja = self.faceTable.getObjaInd(indexModel)
+        # indexObja = self.faceTable.getObjaInd(indexModel)
         
         self.operations.append(('f',indexModel, value))
         
@@ -79,7 +79,7 @@ class Writer(object):
             indexModel (int): the index of the model
             newValue (list): the new value of the vertex
         """
-        indexObja = self.pointTable.getObjaInd(indexModel)
+        # indexObja = self.pointTable.getObjaInd(indexModel)
                 
         self.operations.append(('ev',indexModel,newValue))
     
@@ -90,7 +90,7 @@ class Writer(object):
             indexModel (int): the index of the model
             newValue (Face): the new value of the face
         """        
-        indexObja = self.faceTable.getObjaInd(indexModel)
+        # indexObja = self.faceTable.getObjaInd(indexModel)
         
         self.operations.append(('ef',indexModel,newValue))
         
@@ -216,7 +216,7 @@ def main():
         
     print('test')
         
-    model = parse_file('example/suzanne.obj')
+    model = parse_file('example/cube.obj')
         
     writer = Writer('example/prout.obj',len(model.vertices),len(model.faces))
          
@@ -227,9 +227,15 @@ def main():
     for (indexModel,vertice) in enumerate(model.vertices):
         writer.operation_add_vertex(indexModel,vertice)
         
-    writer.write_output()
-    
-    print('Test successfuly done')   
+    try:
+        writer.write_output()
+    except Exception as e:  # Catch and handle exceptions properly
+        print("An error occurred while writing the output:")
+        print(e)
+        print("Face table:", writer.faceTable)
+        print("Point table:", writer.pointTable)
+        # Optionally re-raise the exception
+        raise 
     
 if __name__ == '__main__':
     print("Main")
