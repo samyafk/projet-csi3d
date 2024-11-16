@@ -1,9 +1,8 @@
 from transcriptionTable import *
-import obja
-from obja import *
 from log import *
 import random
 from tqdm import tqdm
+from obja import *
 
 
 class IndexPointExceedError(Exception):
@@ -56,7 +55,7 @@ class Writer(object):
         if self.logger != None:
             self.logger.msg_log('Add vertex : ' + str(indexModel))
     
-    def operation_add_face(self,indexModel:int,value:obja.Face) -> None:
+    def operation_add_face(self,indexModel:int,value:Face) -> None:
         """Add a face into the operation stack
         
         Args:
@@ -80,7 +79,7 @@ class Writer(object):
         if self.logger != None:
             self.logger.msg_log('Edit vertex : ' + str(indexModel))
     
-    def operation_edit_face(self, indexModel:int,newValue:obja.Face) -> None:
+    def operation_edit_face(self, indexModel:int,newValue:Face) -> None:
         """Edit a face into the operation stack
         
         Args:
@@ -96,7 +95,7 @@ class Writer(object):
         """Change the color of the faces"""
         self.operations.append(('color',0,color))
         
-    def __faceIndexModel_2_faceObjaModel(self,face:obja.Face) -> list:
+    def __faceIndexModel_2_faceObjaModel(self,face:Face) -> list:
         """Convert the index of the face from the model to the obja index
         
         Args:
@@ -125,7 +124,7 @@ class Writer(object):
         # Add the vertex into the output file
         print('v {} {} {}'.format(vertex[0], vertex[1], vertex[2]), file=self.outputFile)
         
-    def __add_face_output(self,indexModel:int,face:obja.Face,color:list=None) -> None:
+    def __add_face_output(self,indexModel:int,face:Face,color:list=None) -> None:
         """Add a face into the output file
 
         Args:
@@ -159,7 +158,7 @@ class Writer(object):
         
         print('ev {} {} {} {}'.format(indexObja+1,vertex[0], vertex[1], vertex[2]), file=self.outputFile)
         
-    def __edit_face_output(self,indexModel:int,face:obja.Face,color:list=None) -> None:
+    def __edit_face_output(self,indexModel:int,face:Face,color:list=None) -> None:
         """Edit a face into the output file
         
         Args:
@@ -237,5 +236,4 @@ def main():
         raise 
     
 if __name__ == '__main__':
-    print("Main")
     main()

@@ -1,6 +1,7 @@
 from obja import *
 from transcriptionTable import *
 import numpy as np
+import pyvista as pv
 
 
 class ModelIteration(object):
@@ -41,6 +42,31 @@ class ModelIteration(object):
         else:
             raise KeyError
         
+    def display_model(self):
+        """
+        Visualizes the 3D object represented by the faces and vertices of the model.
+        """
+        # Extract faces and vertices
+        faces_list = self.getFaces()
+        vertices_list = self.getVertices()
+
+        # Convert vertices to a NumPy array
+        vertices_array = np.array(vertices_list, dtype=np.float32)
+
+        # PyVista expects the faces array to include the number of points in each face
+        faces_with_sizes = []
+        for face in faces_list:
+            faces_with_sizes.append([3,face.a,face.b,face.c])
+        faces_array = np.array(faces_with_sizes, dtype=np.int32)
+
+        # Create a PyVista mesh
+        mesh = pv.PolyData(vertices_array, faces_array)
+
+        # Display the mesh
+        plotter = pv.Plotter()
+        plotter.add_mesh(mesh, color="lightblue", show_edges=True)
+        plotter.show()
+        
 class Model3D(object):
     
     def __init__(self,filename:str):
@@ -60,8 +86,8 @@ class Model3D(object):
         self.numberOfVertices = len(initModel.vertices)
         
         
-    def getLastModel(self):
-        return self.__model[-1]
+    def getLastModel(self)->ModelIteration:
+        return self.__modelList[-1]
     
     def addModelIteration(self,iteration:int,faces:list,vertices:list,facesEvolution:list,verticesEvolution:list):
         
@@ -69,7 +95,7 @@ class Model3D(object):
         model = ModelIteration(iteration,faces,vertices)
         
         # Now, we need to create the transcription table to save a link between the index of the initial model
-        faceTable,verticeTable = self.createTranscriptionTable(model,facesEvolution,verticesEvolution)
+        faceTable,verticeTable = self.__createTranscriptionTable(model,facesEvolution,verticesEvolution)
         
         # Now set theses tables into the current model
         model.setTranscriptionTable('face',faceTable)
@@ -79,7 +105,7 @@ class Model3D(object):
         self.__modelList.append(model)
 
     
-    def createTranscriptionTable(self,model:ModelIteration,facesEvolution:list,verticesEvolution:list):
+    def __createTranscriptionTable(self,model:ModelIteration,facesEvolution:list,verticesEvolution:list):
         
         # iteration must be > 0
         if model.iteration > 0:
@@ -97,14 +123,18 @@ class Model3D(object):
         
         return faceTable,verticeTable
         
-        
-"""
-Objectif : En gros l'objectif c'est d'avoir un object (Model3D), qui regroupe l'évolution de notre modèle à chaque itération. On a donc
-une variable model qui est une liste avec les modèles suivant les différentes itérations. Ca va nous permettre de bien séparer entre 
-chaque itération, et voir si chaque modèle distinct est cohérent (en les affichant dans le future)
 
-Le seul point clé, et de garder un lien entre l'indicage des élements (faces ou points) entre l'itération i et l'itération 0, histoire 
-de ne pas d'avoir d'erreut, mais normalement, en regardant l'évolution et en se basant avec la table de transcription de l'itération
-précédente ça doit passer.
-"""
+def main():
+        
+    # Create a 3DModel
+    filename = 'cube.obj'
+    model = Model3D(filename)
     
+    # Get the last model (here its the 0)
+    firstModel = model.getLastModel()
+    
+    # Display in 3D the model
+    firstModel.display_model()
+    
+if __name__ == '__main__':
+    main()
