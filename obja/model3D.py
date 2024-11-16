@@ -127,7 +127,7 @@ class Model3D(object):
 def main():
         
     # Create a 3DModel
-    filename = 'cube.obj'
+    filename = 'suzanne.obj'
     model = Model3D(filename)
     
     # Get the last model (here its the 0)
