@@ -210,7 +210,7 @@ def calculate_plane(p1, p2, p3):
 
 
 # Calculate the error metrics on every edge of the object
-def calculate_error_metrics(edges: dict, faces: list, vertices: list):
+def calculate_error_metrics(edges: dict, faces: dict, vertices: dict):
     
     # Initialise the error metrics
     error_metrics = dict()
@@ -225,8 +225,8 @@ def calculate_error_metrics(edges: dict, faces: list, vertices: list):
         new_vertex = v1 + v2 / 2      
 
         # Get the faces comprising them
-        v1_faces = [face for face in faces if face.a == edge[0] or face.b == edge[0] or face.c == edge[0]]
-        v2_faces = [face for face in faces if face.a == edge[1] or face.b == edge[1] or face.c == edge[1]]
+        v1_faces = [face for idx, face in faces.items() if face.a == edge[0] or face.b == edge[0] or face.c == edge[0]]
+        v2_faces = [face for idx, face in faces.items() if face.a == edge[1] or face.b == edge[1] or face.c == edge[1]]
 
         # Compute the Q matrix for v1 and v2 :
         # Get the fundamental error quadrics of the planes comprising those faces and add them to Q
@@ -260,7 +260,7 @@ def calculate_error_metrics(edges: dict, faces: list, vertices: list):
         
     return error_metrics
 
-def update_error_metrics(error_metrics: dict, edge: list, edges: dict, faces: list, vertices: list):
+def update_error_metrics(error_metrics: dict, edge: list, edges: dict, faces: dict, vertices: dict):
 
     # Get the vertices of the contracted edge
     v1, v2 = edge
@@ -277,8 +277,8 @@ def update_error_metrics(error_metrics: dict, edge: list, edges: dict, faces: li
         
         # Else
         # Get the faces for the vertices in edge2
-        v1_faces = [face for face in faces if face.a == edge2[0] or face.b == edge2[0] or face.c == edge2[0]]
-        v2_faces = [face for face in faces if face.a == edge2[1] or face.b == edge2[1] or face.c == edge2[1]]
+        v1_faces = [face for idx, face in faces.items() if face.a == edge2[0] or face.b == edge2[0] or face.c == edge2[0]]
+        v2_faces = [face for idx, face in faces.items() if face.a == edge2[1] or face.b == edge2[1] or face.c == edge2[1]]
         
         # Recompute Q matrices for the vertices of edge2
         Q1 = np.zeros((4, 4))
