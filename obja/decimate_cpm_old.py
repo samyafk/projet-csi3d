@@ -2,7 +2,6 @@
 
 import obja
 import numpy as np
-import sys
 from utils import *
 from obja import Face
 import time
@@ -28,11 +27,18 @@ class Decimater(obja.Model):
                     
         # The number of deleted vertices, to exit the while
         deleted_vertices_nb = 0
+        
+        # Number of iterations
+        iteration = 1
+        
+        # Get current time
+        start_time = time.time()
+        total_time = 0
 
-        stop = False;
+        stop = False
         while not stop:
             
-            print("jul")
+            iteration_start_time = time.time()
             
             # Create the dict with the edges
             edges = create_dict_edges([f for idx, f in faces_dict.items() if idx not in self.deleted_faces])
@@ -116,6 +122,10 @@ class Decimater(obja.Model):
                 stop = True
                 
             deleted_vertices_nb = len(self.deleted_vertices)
+            
+            iteration_time = time.time() - iteration_start_time
+            print("Iteration : " + str(iteration) + " - Total deleted vertices : " + str(deleted_vertices_nb) + " - Time : " + str(round(iteration_time,3)) + "s")
+            iteration += 1
                 
         # To rebuild the model, run operations in reverse order
         operations.reverse()
@@ -146,6 +156,10 @@ class Decimater(obja.Model):
                 output_model.edit_face(index, value)        
             else:
                 output_model.edit_vertex(index, value)
+        
+        total_time = time.time() - start_time
+        print("\nTotal Time : " + str(round(total_time,3)) + "s")
+        
 
 def main():
     """
