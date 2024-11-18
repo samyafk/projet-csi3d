@@ -91,9 +91,12 @@ class Writer(object):
         if self.logger != None:
             self.logger.msg_log('Edit face : ' + str(indexModel))
         
-    def operation_change_color_faces(self,color:list) -> None:
+    def operation_change_color_faces(self,color:list,resetColorPreviousFace:bool = True) -> None:
         """Change the color of the faces"""
-        self.operations.append(('color',0,color))
+        if resetColorPreviousFace:
+            self.operations.append(('color',1,color))
+        else:
+            self.operations.append(('color',0,color))
         
     def __faceIndexModel_2_faceObjaModel(self,face:Face) -> list:
         """Convert the index of the face from the model to the obja index
@@ -174,11 +177,23 @@ class Writer(object):
         
         if color != None:
             print('fc {} {} {} {}'.format(indexObja+1,color[0],color[1],color[2]),file=self.outputFile)
+            
+    def __reset_color_faces(self,faceWritted:list=[]):
+        
+        gray_value = 0.5  
+        color = [gray_value, gray_value, gray_value]
+        
+        for indexModel in faceWritted:
+            indexObja = self.faceTable.getObjaInd(indexModel)
+            print('fc {} {} {} {}'.format(indexObja+1,color[0],color[1],color[2]),file=self.outputFile)
         
         
     def write_output(self) -> None:
         """Write the output file"""
         print("Start writing the output file \n")
+        
+        # Face already writted
+        face_writted = []
         
         # Now defind a color for the faces
         gray_value = 0.5  
@@ -193,13 +208,18 @@ class Writer(object):
                 if ty == "v":
                     self.__add_vertex_output(indexModel,value)
                 elif ty == "f":
+                    face_writted.append(indexModel)
                     self.__add_face_output(indexModel, value, color)  
                 elif ty == "ev":
                     self.__edit_vertex_ouput(indexModel, value)
                 elif ty == "ef":
                     self.__edit_face_output(indexModel, value)   
                 elif ty == "color":
-                    color = value     
+                    if indexModel == 1:  
+                        self.__reset_color_faces(face_writted)
+                        color = value   
+                    else:
+                        color = value     
                 else:
                     raise SyntaxError("Too understand the type")
             
