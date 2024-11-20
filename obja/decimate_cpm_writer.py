@@ -53,26 +53,21 @@ class Decimater(obja.Model):
             # Reorder edges based on their error metrics
             sorted_edges = dict(sorted(error_metrics.items(), key=lambda item: item[1]))
             
-            # Check second condition
-            edges = check_second_condition(edges)
-            
-            # Check third condtition
-            check_third_condition(edges)
-            
             # Create list of collapsed vertices
             collapsed_vertices = []
             
             # For each edges in the dict
             for key in sorted_edges:
-                
-                collapsible = edges[key]
-
-                # If second and third condition ok
-                if not collapsible:
-                    continue
-                    
+                   
                 # Get the vertices of the edge
                 edge = key2edg(key)
+                
+                # Check conditions
+                collapsible = check_neighbour(edge, edges)
+
+                # If conditions ok
+                if not collapsible:
+                    continue
                 
                 # Check if one of the two already collapsed
                 if edge[0] in collapsed_vertices or edge[1] in collapsed_vertices:
@@ -148,17 +143,12 @@ class Decimater(obja.Model):
         
         total_time = time.time() - start_time
         print("\nTotal Time : " + str(round(total_time,3)) + "s")
-        
-    def contract(self,faces_dict:dict,vertices_dict:dict):
-        return None
-        
-        
 
 def main():
     """
     Runs the program on the model given as parameter.
     """
-    filename = 'suzanne.obj'
+    filename = 'bunny.obj'
     np.seterr(invalid = 'raise')
     model = Decimater(filename)
     model.CPM()

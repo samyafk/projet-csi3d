@@ -31,7 +31,6 @@ def key2edg(key: str) -> list:
     p1, p2 = map(int, key.split(","))
     
     return [p1, p2]
-    
 
 
 def create_dict_edges(faces: Face) -> dict:
@@ -56,21 +55,6 @@ def create_dict_edges(faces: Face) -> dict:
 
     return edges_dic
 
-def check_second_condition(edges: dict) -> dict:
-    """For each edge e = (v1, v2 ) that will be collapsed and any vertex w that is connected by an
-    edge to both v1 and v2 , the triple (v1 , v2, w) must define a valid triangle in Mi+1 .
-    
-    Args:
-        edges (dict): the dictionnary with the edges
-        
-    Returns:
-        dict: the dictionnary with the edges that are collapsable
-    """
-    for key in edges:
-        edge = key2edg(key)
-        edges[key] = check_neighbour(edge,edges)
-        
-    return edges
 
 def check_neighbour(edge: list, edges: dict) -> bool:
     """Checks that the two vertices of the edge only have two neighbours in common
@@ -82,26 +66,15 @@ def check_neighbour(edge: list, edges: dict) -> bool:
     Returns:
         bool: True if the edge is collapsable, False otherwise
     """    
-    v1, v2 = edge[0], edge[1]
-    v1_neighbours, v2_neighbours = [], []
-    
-    for key in edges:
-        (ve_1,ve_2) = key2edg(key)
-        
-        # Check if ve_1 or ve_2 are in the neighbourhoods
-        if v1==ve_1:
-            v1_neighbours.append(ve_2)
-        if v1==ve_2:
-            v1_neighbours.append(ve_1)
-        if v2==ve_1:
-            v2_neighbours.append(ve_2)
-        if v2==ve_2:
-            v2_neighbours.append(ve_1)
+    v1, v2 = edge[0], edge[1]    
+    v1_neighbours = neighbours(v1, edges)
+    v2_neighbours = neighbours(v2, edges)
             
     intersect = [v for v in v1_neighbours if v in v2_neighbours]
     is_neighbour = len(intersect) <= 2
     
     return is_neighbour
+
 
 def neighbours(vertex: int, edges: list) -> list:
     """Returns the neighbours of a given vertex
@@ -122,75 +95,6 @@ def neighbours(vertex: int, edges: list) -> list:
         
     return neighbours
 
-# FIXME : A revoir
-def vertex_triangle(edge: list, edges: dict) -> tuple:
-    """Checks that the two vertices of the edge only have 2 neighbours 
-    in common and returns these neighbours
-    
-    Args:
-        edge (list): the edge
-        edges (dict): the dictionnary with the edges
-
-    Returns:
-        tuple: the two neighbours
-    """
-    v1, v2 = edge[0], edge[1]
-    v1_neighbours = neighbours(v1, edges)
-    v2_neighbours = neighbours(v2, edges)
-    
-            
-    intersect = [v for v in v1_neighbours if v in v2_neighbours]
-    
-    if len(intersect) != 2:
-        #TODO: Gerer l'execption
-        raise ValueError("The edge doesn't have 2 neighbours in common")
-    
-    return intersect[0], intersect[1]
-
-def check_quad(edge: list, edges: dict) -> None:
-    """Checks if the neighbours are in the center of a quad
-    If that's the case, set all the edges of the quad to non collapsable
-    
-    Args:
-        edge (list): the edge
-        edges (dict): the dictionnary with the edges
-    """
-    try:   
-        w1, w2 = vertex_triangle(edge, edges)
-    except ValueError:
-        return
-        
-    w1_neighbours = neighbours(w1, edges)
-    w2_neighbours = neighbours(w2, edges)
-    
-    if len(w1_neighbours) == 4:
-        for i, j in range(4):
-            key = edg2key(w1_neighbours[i], w1_neighbours[j])
-            if key in edges.keys():
-                edges[key] = False
-    
-    if len(w2_neighbours) == 4:
-        for i, j in range(4):
-            key = edg2key(w2_neighbours[i], w2_neighbours[j])
-            if key in edges.keys():
-                edges[key] = False
-    
-
-def check_third_condition(edges: dict) -> None:
-    """Checks the third condition of the paper
-    
-    Args:
-        edges (dict): the dictionnary with the edges
-    """
-    for key in edges:
-        edge = key2edg(key)
-        check_quad(edge, edges)
-
-def computeTranslation(v1:np.array,v2:np.array,TYPE:str='mean') -> np.array:                    
-    """
-    Compute the translation vector between v1 and v2
-    """      
-    return (v1 - v2)/2
 
 # Calculate the plane equation coefficients from three points
 def calculate_plane(p1, p2, p3):

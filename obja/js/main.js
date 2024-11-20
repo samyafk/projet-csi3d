@@ -4,7 +4,7 @@ init();
 animate();
 
 function init() {
-  let url = document.URL.split("?")[1] || "example/suzanne.obja";
+  let url = document.URL.split("?")[1] || "example/bunny.obja";
 
   loader = new Loader(url, 1024, 20);
   loader.start(function (elements) {
