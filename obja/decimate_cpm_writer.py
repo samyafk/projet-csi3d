@@ -21,7 +21,7 @@ class Decimater(obja.Model):
         self.logger = Logger()
         self.writer = Writer('example/'+filename, len(self.vertices), len(self.faces), self.logger)
 
-    def contract(self):
+    def CPM(self):
         
         # Create a dict of the vertices and the faces
         faces_dict = {i: face for i, face in enumerate(self.faces)}
@@ -42,8 +42,10 @@ class Decimater(obja.Model):
             
             iteration_start_time = time.time()
             
+            remainingFaces = [f for idx, f in faces_dict.items() if idx not in self.deleted_faces]
+            
             # Create the dict with the edges
-            edges = create_dict_edges([f for idx, f in faces_dict.items() if idx not in self.deleted_faces])
+            edges = create_dict_edges(remainingFaces)
             
             # Calculate the error metrics
             error_metrics = calculate_error_metrics(edges, faces_dict, vertices_dict)
@@ -147,6 +149,10 @@ class Decimater(obja.Model):
         total_time = time.time() - start_time
         print("\nTotal Time : " + str(round(total_time,3)) + "s")
         
+    def contract(self,faces_dict:dict,vertices_dict:dict):
+        return None
+        
+        
 
 def main():
     """
@@ -155,7 +161,7 @@ def main():
     filename = 'suzanne.obj'
     np.seterr(invalid = 'raise')
     model = Decimater(filename)
-    model.contract()
+    model.CPM()
 
 
 if __name__ == '__main__':
