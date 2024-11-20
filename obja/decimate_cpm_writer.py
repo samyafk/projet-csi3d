@@ -66,54 +66,48 @@ class Decimater(obja.Model):
                 collapsible = check_neighbour(edge, edges)
 
                 # If conditions ok
-                if not collapsible:
+                if not collapsible or edge[0] in collapsed_vertices or edge[1] in collapsed_vertices:
                     continue
+                    
+                # Add the two vertex into the list : collapsed_vertices
+                collapsed_vertices.append(edge[0])
+                collapsed_vertices.append(edge[1])
                 
-                # Check if one of the two already collapsed
-                if edge[0] in collapsed_vertices or edge[1] in collapsed_vertices:
-                    edges[key] = False
-                    pass
-                else:
-                    
-                    # Add the two vertex into the list : collapsed_vertices
-                    collapsed_vertices.append(edge[0])
-                    collapsed_vertices.append(edge[1])
-                    
-                    # Get the coord of the first vertex
-                    coordVert1 = vertices_dict[edge[0]]
-                    
-                    # Get the coord of the second vertex
-                    coordVert2 = vertices_dict[edge[1]]
-                    
-                    # Compute the translation vector
-                    t = (coordVert2 - coordVert1)/2
-                    
-                    # Collapse the edge
-                    for face_index, face in faces_dict.items():
-                        # Delete any face related to this edge
-                        if face_index not in self.deleted_faces:
-                            if edge[0] in [face.a,face.b,face.c] and edge[1] in [face.a,face.b,face.c]:
-                                self.deleted_faces.add(face_index)
-                                # Add the instruction to operations stack
-                                self.writer.operation_add_face(face_index,face)
-                            elif edge[1] in [face.a,face.b,face.c]:
-                                self.writer.operation_edit_face(face_index,Face(face.a, face.b, face.c))
-                                if edge[1] == face.a:
-                                    face.a = edge[0]
-                                elif edge[1] == face.b:
-                                    face.b = edge[0]
-                                elif edge[1] == face.c:
-                                    face.c = edge[0]
-                    
-                    # Translate vertex1
-                    vertices_dict[edge[0]] = coordVert1 + t
-                    self.writer.operation_edit_vertex(edge[0],coordVert1)
-                    
-                    # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
-                    self.writer.operation_add_vertex(edge[1],coordVert2)
-                    self.deleted_vertices.add(edge[1])                    
-                    # Update error metrics of edges involving vertex1 and vertex2
-                    update_error_metrics(error_metrics, edge, edges, faces_dict, vertices_dict)
+                # Get the coord of the first vertex
+                coordVert1 = vertices_dict[edge[0]]
+                
+                # Get the coord of the second vertex
+                coordVert2 = vertices_dict[edge[1]]
+                
+                # Compute the translation vector
+                t = (coordVert2 - coordVert1)/2
+                
+                # Collapse the edge
+                for face_index, face in faces_dict.items():
+                    # Delete any face related to this edge
+                    if face_index not in self.deleted_faces:
+                        if edge[0] in [face.a,face.b,face.c] and edge[1] in [face.a,face.b,face.c]:
+                            self.deleted_faces.add(face_index)
+                            # Add the instruction to operations stack
+                            self.writer.operation_add_face(face_index,face)
+                        elif edge[1] in [face.a,face.b,face.c]:
+                            self.writer.operation_edit_face(face_index,Face(face.a, face.b, face.c))
+                            if edge[1] == face.a:
+                                face.a = edge[0]
+                            elif edge[1] == face.b:
+                                face.b = edge[0]
+                            elif edge[1] == face.c:
+                                face.c = edge[0]
+                
+                # Translate vertex1
+                vertices_dict[edge[0]] = coordVert1 + t
+                self.writer.operation_edit_vertex(edge[0],coordVert1)
+                
+                # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
+                self.writer.operation_add_vertex(edge[1],coordVert2)
+                self.deleted_vertices.add(edge[1])                    
+                # Update error metrics of edges involving vertex1 and vertex2
+                update_error_metrics(error_metrics, edge, edges, faces_dict, vertices_dict)
                       
             # If no edge has been collapsed in the loop, get out from it
             if len(self.deleted_vertices) == deleted_vertices_nb:
