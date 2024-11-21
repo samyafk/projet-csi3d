@@ -8,6 +8,8 @@ from writer import *
 from log import *
 import time
 import random
+import matplotlib.pyplot as plt
+
 
 class Decimater(obja.Model):
     """
@@ -18,8 +20,27 @@ class Decimater(obja.Model):
         self.parse_file('example/'+filename)
         self.deleted_faces = set()
         self.deleted_vertices = set()
+        self.nb_of_faces_metrics = []
+        self.nb_of_vertices_metrics = []
+        self.iteration = 0
         self.logger = Logger()
         self.writer = Writer('example/'+filename, len(self.vertices), len(self.faces), self.logger)
+    
+    def plot_metrics(self):
+        # This function plots the number of vertices and faces over the iterations
+        iterations = np.arange(1, self.iteration)
+        plt.plot(iterations, self.nb_of_faces_metrics, label='Number of Faces', color='blue')
+        plt.plot(iterations, self.nb_of_vertices_metrics, label='Number of Vertices', color='red')
+        plt.xlabel('Iterations')
+        plt.ylabel('Number of Vertices and Faces')
+        plt.legend()
+        
+
+        # Add legends
+        plt.title('Number of Vertices and Faces over Iterations')
+        plt.show()
+        
+        
 
     def CPM(self):
         
@@ -31,7 +52,7 @@ class Decimater(obja.Model):
         deleted_vertices_nb = 0
         
         # Number of iterations
-        iteration = 1
+        self.iteration = 1
         
         # Get current time
         start_time = time.time()
@@ -43,6 +64,8 @@ class Decimater(obja.Model):
             iteration_start_time = time.time()
             
             remainingFaces = [f for idx, f in faces_dict.items() if idx not in self.deleted_faces]
+            self.nb_of_faces_metrics.append(len(remainingFaces))
+            self.nb_of_vertices_metrics.append(len(vertices_dict) - len(self.deleted_vertices))
             
             # Create the dict with the edges
             edges = create_dict_edges(remainingFaces)
@@ -119,8 +142,8 @@ class Decimater(obja.Model):
             self.writer.operation_change_color_faces([random.uniform(0.1, 0.5),random.uniform(0.1, 0.5),random.uniform(0.1, 0.5)],True)
             
             iteration_time = time.time() - iteration_start_time
-            print("Iteration : " + str(iteration) + " - Total deleted vertices : " + str(deleted_vertices_nb) + " - Time : " + str(round(iteration_time,3)) + "s")
-            iteration += 1
+            print("Iteration : " + str(self.iteration) + " - Total deleted vertices : " + str(deleted_vertices_nb) + " - Time : " + str(round(iteration_time,3)) + "s")
+            self.iteration += 1
                 
                 
         # Add remaining faces
@@ -146,6 +169,8 @@ def main():
     np.seterr(invalid = 'raise')
     model = Decimater(filename)
     model.CPM()
+    
+    model.plot_metrics()
 
 
 if __name__ == '__main__':
