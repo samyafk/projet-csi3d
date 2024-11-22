@@ -6,9 +6,11 @@ from utils import *
 from obja import Face
 from writer import *
 from log import *
+from model3D import *
 import time
 import random
 import matplotlib.pyplot as plt
+import pyvista as pv
 
 
 class Decimater(obja.Model):
@@ -25,6 +27,8 @@ class Decimater(obja.Model):
         self.iteration = 0
         self.logger = Logger()
         self.writer = Writer('example/'+filename, len(self.vertices), len(self.faces), self.logger)
+        
+        self.model3D = Model3D(filename)
     
     def plot_metrics(self):
         # This function plots the number of vertices and faces over the iterations
@@ -136,7 +140,17 @@ class Decimater(obja.Model):
             if len(self.deleted_vertices) == deleted_vertices_nb:
                 stop = True
                                 
+            # Get the numbers of vertices
             deleted_vertices_nb = len(self.deleted_vertices)
+            
+            # Get the remaining faces and vertices in order to create a model of the remaining info
+            remainingFaces = [f for idx, f in faces_dict.items() if idx not in self.deleted_faces]
+            remainingVertices = [v for idx, v in vertices_dict.items() if idx not in self.deleted_vertices]
+            
+            #FIXME
+            # En gros y'a un probleme d'index des faces et donc les sous modèles sont mauvais            
+            
+            self.model3D.addModelIteration(self.iteration,remainingFaces,remainingVertices)
             
             # Change the color of the face
             self.writer.operation_change_color_faces([random.uniform(0.1, 0.5),random.uniform(0.1, 0.5),random.uniform(0.1, 0.5)],True)
@@ -160,17 +174,23 @@ class Decimater(obja.Model):
         
         total_time = time.time() - start_time
         print("\nTotal Time : " + str(round(total_time,3)) + "s")
+        
+    def display_model(self,iteration:int):
+        
+        self.model3D.display_specific_iteration(iteration)
+        
 
 def main():
     """
     Runs the program on the model given as parameter.
     """
-    filename = 'bunny.obj'
+    filename = 'suzanne.obj'
     np.seterr(invalid = 'raise')
     model = Decimater(filename)
     model.CPM()
+    model.display_model(1)
     
-    model.plot_metrics()
+    #model.plot_metrics()
 
 
 if __name__ == '__main__':

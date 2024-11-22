@@ -2,6 +2,7 @@ from obja import *
 from transcriptionTable import *
 import numpy as np
 import pyvista as pv
+import math
 
 
 class ModelIteration(object):
@@ -11,13 +12,6 @@ class ModelIteration(object):
         self.iteration = iteration
         self.__faces = faces
         self.__vertices = vertices
-        
-        if iteration == 0:
-            self.__facesTable = TranscriptionTable("Iter " + str(iteration) + " facesTable",len(faces),"Identity")
-            self.__verticesTable = TranscriptionTable("Iter " + str(iteration) + " verticesTable",len(faces),"Identity")
-        else:
-            self.__facesTable = TranscriptionTable("Iter " + str(iteration) + " facesTable",len(faces))
-            self.__verticesTable = TranscriptionTable("Iter " + str(iteration) + " verticesTable",len(faces))
             
         
     def getFaces(self):
@@ -34,18 +28,19 @@ class ModelIteration(object):
         else:
             raise KeyError
         
-    def setTranscriptionTable(self,objectType:str,table:np.array):
-        if objectType == 'face':
-            self.__facesTable = table
-        elif objectType == 'vertice':
-            self.__verticesTable = table
-        else:
-            raise KeyError
-        
     def display_model(self):
         """
         Visualizes the 3D object represented by the faces and vertices of the model.
         """
+        mesh = self.get_3D_mesh()
+
+        # Display the mesh
+        plotter = pv.Plotter()
+        plotter.add_mesh(mesh, color="lightblue", show_edges=True)
+        plotter.show()
+        
+    def get_3D_mesh(self)->pv.PolyData:
+        
         # Extract faces and vertices
         faces_list = self.getFaces()
         vertices_list = self.getVertices()
@@ -53,19 +48,17 @@ class ModelIteration(object):
         # Convert vertices to a NumPy array
         vertices_array = np.array(vertices_list, dtype=np.float32)
 
-        # PyVista expects the faces array to include the number of points in each face
-        faces_with_sizes = []
+        # PyVista expects a flattened array with the number of points at the beginning of each face
+        faces_flat = []
         for face in faces_list:
-            faces_with_sizes.append([3,face.a,face.b,face.c])
-        faces_array = np.array(faces_with_sizes, dtype=np.int32)
+            faces_flat.extend([3, face.a, face.b, face.c])  
+        faces_array = np.array(faces_flat, dtype=np.int32)
 
         # Create a PyVista mesh
         mesh = pv.PolyData(vertices_array, faces_array)
+        
+        return mesh
 
-        # Display the mesh
-        plotter = pv.Plotter()
-        plotter.add_mesh(mesh, color="lightblue", show_edges=True)
-        plotter.show()
         
 class Model3D(object):
     
@@ -89,39 +82,87 @@ class Model3D(object):
     def getLastModel(self)->ModelIteration:
         return self.__modelList[-1]
     
-    def addModelIteration(self,iteration:int,faces:list,vertices:list,facesEvolution:list,verticesEvolution:list):
+    def addModelIteration(self,iteration:int,faces:list,vertices:list):
         
         # First of all, create a new ModelIteration
         model = ModelIteration(iteration,faces,vertices)
         
-        # Now, we need to create the transcription table to save a link between the index of the initial model
-        faceTable,verticeTable = self.__createTranscriptionTable(model,facesEvolution,verticesEvolution)
-        
-        # Now set theses tables into the current model
-        model.setTranscriptionTable('face',faceTable)
-        model.setTranscriptionTable('vertice',verticeTable)
-        
         # Finally, add this model into the modelList
         self.__modelList.append(model)
+        
 
-    
-    def __createTranscriptionTable(self,model:ModelIteration,facesEvolution:list,verticesEvolution:list):
+    def display_all_models(self):
+        """
+        Displays all ModelIteration objects stored in the Model3D instance.
+        """
+        # Get the number of different models
+        numberModel = len(self.__modelList)
         
-        # iteration must be > 0
-        if model.iteration > 0:
-            raise NameError
+        # Dynamically calculate rows and columns for the grid
+        nbrCol = 3  # Fixed number of columns
+        nbrRows = math.ceil(numberModel / nbrCol)  # Dynamically compute rows
         
-        # We need to have the transcription table of the iteration 0, but it's only an identity, so let's recreate it
-        faceTable = np.array([i for i in range(self.numberOfFaces)])
-        verticeTable = np.array([i for i in range(self.numberOfVertices)])
+        # Create the plotter with the appropriate shape
+        plotter = pv.Plotter(shape=(nbrRows, nbrCol))
         
-        # The algorithm is simple : 
-        #   When evolution[i] = 1 -> We do nothing
-        #   When evolution[i] = 0 -> We remove the value with the index i of the list
-        faceTable = [valeur for i, valeur in enumerate(faceTable) if facesEvolution[i] == 1]
-        verticeTable = [valeur for i, valeur in enumerate(verticeTable) if verticesEvolution[i] == 1]
+        # Iterate through the models
+        for iteration in range(numberModel):
+            # Get the model and mesh
+            model = self.__modelList[iteration]
+            mesh = model.get_3D_mesh()
+            
+            # Calculate subplot position
+            row = iteration // nbrCol
+            col = iteration % nbrCol
+            
+            # Add the mesh to the plotter
+            plotter.subplot(row, col)
+            plotter.add_mesh(mesh, color="lightblue", show_edges=True)
+            plotter.add_text(f"Iteration {iteration}")
         
-        return faceTable,verticeTable
+        # Adjust camera and view
+        plotter.view_isometric()
+        
+        # Show the plotter
+        plotter.show()
+
+        # Clean up resources
+        plotter.close()
+        
+    import pyvista as pv
+
+    def display_specific_iteration(self, iteration_index):
+        """
+        Displays a specific ModelIteration object by its index.
+
+        Parameters:
+        -----------
+        iteration_index : int
+            The index of the ModelIteration object to display.
+        """
+        # Ensure the index is valid
+        if iteration_index < 0 or iteration_index >= len(self.__modelList):
+            raise ValueError(f"Invalid iteration index {iteration_index}. Must be between 0 and {len(self.__modelList) - 1}.")
+        
+        # Get the model and its mesh
+        model = self.__modelList[iteration_index]
+        mesh = model.get_3D_mesh()
+        
+        # Create a new Plotter for this iteration
+        plotter = pv.Plotter()
+        plotter.add_mesh(mesh, color="lightblue", show_edges=True)
+        plotter.add_text(f"Iteration {iteration_index}", font_size=10)
+        plotter.view_isometric()
+        
+        # Show the plotter
+        plotter.show()
+        
+        # Explicitly close the plotter to free resources
+        plotter.close()
+
+
+
+
         
 
 def main():
