@@ -4,18 +4,18 @@ import numpy as np
 
 # Test the edg2key function
 def t_edg2key():
-    p1, p2, p3, p4 = 1, 2, 506, 987
+    p1, p2, p3, p4 = 1, 2, 987, 506
     
-    if edg2key(p1,p2) == '1,2' and edg2key(p3,p4) == '506,987':
+    if edg2key(p1,p2) == '1,2' and edg2key(p3,p4) == '987,506':
         return True
     else:
         return False
     
 # Test the key2edg function
 def t_key2edg():
-    key1, key2 = '1,2', '506,987'
+    key1, key2 = '1,2', '987,506'
     
-    if key2edg(key1) == [1,2] and key2edg(key2) == [506,987]:
+    if key2edg(key1) == [1,2] and key2edg(key2) == [987,506]:
         return True
     else:
         return False
