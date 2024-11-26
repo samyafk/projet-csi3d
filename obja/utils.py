@@ -55,7 +55,7 @@ def create_list_edges(faces: Face) -> list:
     return edges_list
 
 
-def check_neighbour(edge: list, edges: dict) -> bool:
+def check_neighbour(edge: list, edges: list) -> bool:
     """Checks that the two vertices of the edge only have two neighbours in common
     
     Args:
@@ -162,53 +162,3 @@ def calculate_error_metrics(edges: list, faces: dict, vertices: dict):
         error_metrics[key] = error_metric
         
     return error_metrics
-
-def update_error_metrics(error_metrics: dict, edge: list, edges: dict, faces: dict, vertices: dict):
-
-    # Get the vertices of the contracted edge
-    v1, v2 = edge
-    new_vertex = (np.array(vertices[v1]) + np.array(vertices[v2])) / 2
-
-    # Update the error metrics of each edge involving one of edge's vertex
-    for key in edges:
-        
-        edge2 = key2edg(key)
-
-        # If edge2 is not related to edge, do nothing
-        if not (edge2[0] == v1 or edge2[1] == v1 or edge2[0] == v2 or edge2[1] == v2):
-            continue
-        
-        # Else
-        # Get the faces for the vertices in edge2
-        v1_faces = [face for idx, face in faces.items() if face.a == edge2[0] or face.b == edge2[0] or face.c == edge2[0]]
-        v2_faces = [face for idx, face in faces.items() if face.a == edge2[1] or face.b == edge2[1] or face.c == edge2[1]]
-        
-        # Recompute Q matrices for the vertices of edge2
-        Q1 = np.zeros((4, 4))
-        Q2 = np.zeros((4, 4))
-
-        for face in v1_faces:
-            p1, p2, p3 = vertices[face.a], vertices[face.b], vertices[face.c]
-            a, b, c, d = calculate_plane(np.array(p1), np.array(p2), np.array(p3))
-            K = np.array([[a**2, a*b, a*c, a*d],
-                          [a*b, b**2, b*c, b*d],
-                          [a*c, b*c, c**2, c*d],
-                          [a*d, b*d, c*d, d**2]])
-            Q1 += K
-            
-        for face in v2_faces:
-            p1, p2, p3 = vertices[face.a], vertices[face.b], vertices[face.c]
-            a, b, c, d = calculate_plane(np.array(p1), np.array(p2), np.array(p3))
-            K = np.array([[a**2, a*b, a*c, a*d],
-                          [a*b, b**2, b*c, b*d],
-                          [a*c, b*c, c**2, c*d],
-                          [a*d, b*d, c*d, d**2]])
-            Q2 += K
-
-        # Calculate the combined Q matrix for the edge
-        Q = Q1 + Q2
-        new_vertex_homogeneous = np.append(new_vertex, 1)
-        error_metric = new_vertex_homogeneous @ Q @ new_vertex_homogeneous  # error_metric = new_vertex.T * Q * new_vertex
-
-        # Update the error metric for edge2 in the dictionary
-        error_metrics[key] = error_metric

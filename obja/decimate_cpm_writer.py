@@ -85,12 +85,12 @@ class Decimater(obja.Model):
             
             # For each edges in the dict
             for key in sorted_edges:
-                   
+
                 # Get the vertices of the edge
                 edge = key2edg(key)
                 
                 # Check conditions
-                collapsible = check_neighbour(edge, edges)
+                collapsible = check_neighbour(edge, sorted_edges)
 
                 # If conditions ok
                 if not collapsible or edge[0] in collapsed_vertices or edge[1] in collapsed_vertices:
@@ -132,9 +132,7 @@ class Decimater(obja.Model):
                 
                 # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
                 self.writer.operation_add_vertex(edge[1],coordVert2)
-                self.deleted_vertices.add(edge[1])                    
-                # Update error metrics of edges involving vertex1 and vertex2
-                update_error_metrics(error_metrics, edge, edges, faces_dict, vertices_dict)
+                self.deleted_vertices.add(edge[1])
                       
             # If no edge has been collapsed in the loop, get out from it
             if len(self.deleted_vertices) == deleted_vertices_nb:

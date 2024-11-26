@@ -25,7 +25,7 @@ def t1_check_neighbour():
     edge = [0,1]
     
     # List of the edges of the problematic figure (b)
-    edges = create_dict_edges([[0,1,2],[0,1,4],[0,3,1]])
+    edges = create_list_edges([[0,1,2],[0,1,4],[0,3,1]])
     
     # Return of the check
     return check_neighbour(edge, edges)
@@ -35,23 +35,10 @@ def t2_check_neighbour():
     edge = [0,2]
     
     # List of the edges of the problematic figure (b)
-    edges = create_dict_edges([[0,1,2],[0,1,4],[0,3,1]])
+    edges = create_list_edges([[0,1,2],[0,1,4],[0,3,1]])
     
     # Return of the check
     return check_neighbour(edge, edges)
-
-def t_check_second_condition():
-    
-    # List of the edges of the problematic figure (b)
-    edges = create_dict_edges([[0,1,2],[0,1,4],[0,3,1]])
-    
-    verifedges = edges
-    
-    edges = check_second_condition(edges)
-    
-    verifedges[edg2key(0,1)] = False
-    
-    return edges == verifedges
     
 
 class TestPrime(unittest.TestCase):
@@ -63,8 +50,6 @@ class TestPrime(unittest.TestCase):
         self.assertFalse(t1_check_neighbour())
     def test_2_check_neighbour(self):
         self.assertTrue(t2_check_neighbour())
-    def test_check_second_condition(self):
-        self.assertTrue(t_check_second_condition())
 
         
         
