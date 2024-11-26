@@ -22,12 +22,13 @@ class Decimater(obja.Model):
         self.parse_file('example/'+filename)
         self.deleted_faces = set()
         self.deleted_vertices = set()
+        self.num_init_faces = len(self.faces)
+        self.num_init_vertices = len(self.vertices)
         self.nb_of_faces_metrics = []
         self.nb_of_vertices_metrics = []
         self.iteration = 0
         self.logger = Logger()
-        self.writer = Writer('example/'+filename, len(self.vertices), len(self.faces), self.logger)
-        
+        self.writer = Writer('example/'+filename, self.num_init_vertices, self.num_init_faces, self.logger)
         self.model3D = Model3D(filename)
     
     def plot_metrics(self):
@@ -46,7 +47,7 @@ class Decimater(obja.Model):
         
         
 
-    def CPM(self):
+    def CPM(self,tauxCompression:float):
         
         # Create a dict of the vertices and the faces
         faces_dict = {i: face for i, face in enumerate(self.faces)}
@@ -133,9 +134,12 @@ class Decimater(obja.Model):
                 # Delete vertex2 (no need to delete it from self.vertices bc we create edges using faces and it wont appear in the faces anymore)
                 self.writer.operation_add_vertex(edge[1],coordVert2)
                 self.deleted_vertices.add(edge[1])
-                      
+            
+            # Compute the value of the compression
+            compression = 100 * (len(self.deleted_vertices) + len(self.deleted_faces))/(self.num_init_vertices + self.num_init_faces)
+            
             # If no edge has been collapsed in the loop, get out from it
-            if len(self.deleted_vertices) == deleted_vertices_nb:
+            if len(self.deleted_vertices) == deleted_vertices_nb or compression > tauxCompression:
                 stop = True
                                 
             # Get the numbers of vertices
@@ -195,7 +199,8 @@ def main():
     filename = 'suzanne.obj'
     np.seterr(invalid = 'raise')
     model = Decimater(filename)
-    model.CPM()
+    tauxCompression = 97
+    model.CPM(tauxCompression)
     model.display_model(1)
     
     #model.plot_metrics()
