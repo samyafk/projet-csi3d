@@ -72,7 +72,7 @@ class Decimater(obja.Model):
             self.nb_of_vertices_metrics.append(len(vertices_dict) - len(self.deleted_vertices))
             
             # Create the dict with the edges
-            edges = create_dict_edges(remainingFaces)
+            edges = create_list_edges(remainingFaces)
             
             # Calculate the error metrics
             error_metrics = calculate_error_metrics(edges, faces_dict, vertices_dict)

@@ -33,7 +33,7 @@ def key2edg(key: str) -> list:
     return [p1, p2]
 
 
-def create_dict_edges(faces: Face) -> dict:
+def create_list_edges(faces: Face) -> list:
     """Create a dictionnay. The key are the edges with a format 'p1,p2'. And the value is a counter of the number of face
     where (p1,p2) is in.
 
@@ -43,17 +43,16 @@ def create_dict_edges(faces: Face) -> dict:
     Returns:
         dict: A dict
     """
-    edges_dic = {}
+    edges_list = []
     
     for face in faces:
         points = [face.a,face.b,face.c,face.a]
         
         for i in range(3):
-            edge = [points[i],points[i+1]]
             key = edg2key(points[i],points[i+1])
-            edges_dic[key] = True
+            edges_list.append(key)
 
-    return edges_dic
+    return edges_list
 
 
 def check_neighbour(edge: list, edges: dict) -> bool:
@@ -114,7 +113,7 @@ def calculate_plane(p1, p2, p3):
 
 
 # Calculate the error metrics on every edge of the object
-def calculate_error_metrics(edges: dict, faces: dict, vertices: dict):
+def calculate_error_metrics(edges: list, faces: dict, vertices: dict):
     
     # Initialise the error metrics
     error_metrics = dict()
