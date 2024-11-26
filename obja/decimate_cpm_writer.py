@@ -144,11 +144,21 @@ class Decimater(obja.Model):
             deleted_vertices_nb = len(self.deleted_vertices)
             
             # Get the remaining faces and vertices in order to create a model of the remaining info
-            remainingFaces = [f for idx, f in faces_dict.items() if idx not in self.deleted_faces]
-            remainingVertices = [v for idx, v in vertices_dict.items() if idx not in self.deleted_vertices]
+            remainingFaces = [[f.a,f.b,f.c] for idx, f in faces_dict.items() if idx not in self.deleted_faces]
+            flattened_list = [item for sublist in remainingFaces for item in sublist]
             
-            #FIXME
-            # En gros y'a un probleme d'index des faces et donc les sous modèles sont mauvais            
+            # parcours sur les vertices
+            remainingVertices = []
+            
+            for idx, v in vertices_dict.items():
+                if idx not in self.deleted_vertices:
+                    remainingVertices.append(v)
+                    newIndice = len(remainingVertices)
+                    for indice in range(len(flattened_list)):
+                        if flattened_list[indice] == idx:
+                            flattened_list[indice] = newIndice
+
+            remainingFaces = [flattened_list[i:i+3] for i in range(0, len(flattened_list), 3)]
             
             self.model3D.addModelIteration(self.iteration,remainingFaces,remainingVertices)
             

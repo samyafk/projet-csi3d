@@ -51,8 +51,8 @@ class ModelIteration(object):
         # PyVista expects a flattened array with the number of points at the beginning of each face
         faces_flat = []
         for face in faces_list:
-            faces_flat.extend([3, face.a, face.b, face.c])  
-        faces_array = np.array(faces_flat, dtype=np.int32)
+            faces_flat.append([3, *[face[ind] for ind in range(len(face))]])
+        faces_array = np.array(faces_flat)
 
         # Create a PyVista mesh
         mesh = pv.PolyData(vertices_array, faces_array)
@@ -71,8 +71,11 @@ class Model3D(object):
         initModel = Model()
         initModel.parse_file('example/'+filename)
         
+        # First convert the list of faces into a list of list
+        faces = [[f.a,f.b,f.c] for f in initModel.faces]
+        
         # Create the ModelIteration object associated of the inital model
-        self.__modelList.append(ModelIteration(0,initModel.faces,initModel.vertices))
+        self.__modelList.append(ModelIteration(0,faces,initModel.vertices))
         
         # Get the number of faces and vertices
         self.numberOfFaces = len(initModel.faces)
